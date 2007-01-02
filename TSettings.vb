@@ -75,7 +75,7 @@ Public Class TSettings
     Private FAmbient As Boolean
     Private FEvening As Boolean
 
-
+    ' random seeds
     Private FObjectSeed As Integer
     Private FColorSeed As Integer
  
