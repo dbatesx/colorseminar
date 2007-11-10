@@ -87,7 +87,7 @@ Public Class FormPainting
         Dim painter As New TPainter
          PictureBox1.Size = Me.ClientSize 'New System.Drawing.Size(Me.WinWidth, Me.Height)
         ' PictureBox1.Image = New Bitmap(PictureBox1.Width, PictureBox1.Height)
-        PictureBox1.Image = New Bitmap(PictureBox1.Width, 460) 'PictureBox1.Height)
+        PictureBox1.Image = New Bitmap(PictureBox1.Width, PictureBox1.Height) 'PictureBox1.Height)
 
         painter.Image = PictureBox1.Image
         painter.Settings = FSettings

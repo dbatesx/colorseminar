@@ -11,12 +11,12 @@ Public Class TSettings
     Private FMountainous As Boolean
     Private FRollingHills As Boolean
     Private FPrairie As Boolean
-    Private FLake As Boolean
-    Private FRiver As Boolean
     Private FLocalArea As Boolean
     Private FHazy As Boolean
 
     'Foreground
+    Private FLake As Boolean
+    Private FRiver As Boolean
     Private FRoad As Boolean
     Private FTrees As Boolean
     Private FWaterFall As Boolean
@@ -49,35 +49,101 @@ Public Class TSettings
     Private Fforeground As Boolean
     Private FScheme As Integer
     Private FDominantColor As Integer
-    Private FColours(6) As Integer
+    Private FColours(14) As Integer
     Private FTonalComposition As Integer
     Private FDesign As Integer
     Private FCanvasHeight As Integer
     Private FCanvasWidth As Integer
 
     'ColorTest'
-    Private FOther As Boolean
-    Private FCmb As Boolean
+    Private FTintsShades As Boolean
+    Private FCMB As Boolean
     Private FNtr As Boolean 'Neither
 
+    Private Fshanum As Integer
+    Private Fdarktone As Integer
+    Private Fdarkcolor As Integer
+    Private Flighttone As Integer
+    Private Flightcolor As Integer
+
     'Intensity
+    Private FIntensity As String
+    Private FIntense As Integer
     Private FFullRange As Boolean
     Private FHigh As Boolean
     Private FMedium As Boolean
     Private FLow As Boolean
 
-
+    'Values design
+    Private Ftonalcomp As String
+    Private FLMD As Boolean
+    Private FLDM As Boolean
+    Private FMLD As Boolean
+    Private FMDL As Boolean
+    Private FDML As Boolean
+    Private FDLM As Boolean
 
     'Sun Placement
     Private FLeft As Boolean
-    Private FCentral As Boolean
+    Private FAbove As Boolean
     Private FRight As Boolean
     Private FAmbient As Boolean
     Private FEvening As Boolean
 
     ' random seeds
+    Private FMix As String
     Private FObjectSeed As Integer
     Private FColorSeed As Integer
+    Private FSubject As String
+    Private Fside As Integer
+    Property side() As Integer
+        Get
+            Return Fside
+        End Get
+        Set(ByVal value As Integer)
+            Fside = value
+        End Set
+    End Property
+    Property darktone() As Integer
+        Get
+            Return Fdarktone
+        End Get
+        Set(ByVal value As Integer)
+            Fdarktone = value
+        End Set
+    End Property
+    Property darkcolor() As Integer
+        Get
+            Return Fdarkcolor
+        End Get
+        Set(ByVal value As Integer)
+            Fdarkcolor = value
+        End Set
+    End Property
+    Property lighttone() As Integer
+        Get
+            Return Flighttone
+        End Get
+        Set(ByVal value As Integer)
+            Flighttone = value
+        End Set
+    End Property
+    Property lightcolor() As Integer
+        Get
+            Return Flightcolor
+        End Get
+        Set(ByVal value As Integer)
+            Flightcolor = value
+        End Set
+    End Property
+    Property tonalcomp() As String
+        Get
+            Return Ftonalcomp
+        End Get
+        Set(ByVal value As String)
+            Ftonalcomp = value
+        End Set
+    End Property
  
     Property BigSky() As Boolean
         Get
@@ -329,12 +395,12 @@ Public Class TSettings
             FCmb = value
         End Set
     End Property
-    Property Other() As Boolean
+    Property TintsShades() As Boolean
         Get
-            Return FOther
+            Return FTintsShades
         End Get
         Set(ByVal value As Boolean)
-            FOther = value
+            FTintsShades = value
         End Set
     End Property
     Property Ntr() As Boolean
@@ -345,6 +411,14 @@ Public Class TSettings
             FNtr = value
         End Set
     End Property
+    Property shanum() As Integer
+        Get
+            Return Fshanum
+        End Get
+        Set(ByVal value As Integer)
+            Fshanum = value
+        End Set
+    End Property
     Property left() As Boolean
         Get
             Return FLeft
@@ -353,12 +427,12 @@ Public Class TSettings
             FLeft = value
         End Set
     End Property
-    Property Central() As Boolean
+    Property Above() As Boolean
         Get
-            Return FCentral
+            Return FAbove
         End Get
         Set(ByVal value As Boolean)
-            FCentral = value
+            FAbove = value
         End Set
     End Property
     Property Right() As Boolean
@@ -383,6 +457,14 @@ Public Class TSettings
         End Get
         Set(ByVal value As Boolean)
             FEvening = True
+        End Set
+    End Property
+    Property Intensity() As String
+        Get
+            Return FIntensity
+        End Get
+        Set(ByVal value As String)
+            FIntensity = value
         End Set
     End Property
     Property FullRange() As Boolean
@@ -417,6 +499,22 @@ Public Class TSettings
             FLow = value
         End Set
     End Property
+    Property Mix() As String
+        Get
+            Return FMix
+        End Get
+        Set(ByVal value As String)
+            FMix = value
+        End Set
+    End Property
+    Property subject() As String
+        Get
+            Return FSubject
+        End Get
+        Set(ByVal value As String)
+            FSubject = value
+        End Set
+    End Property
   
     Property TonalComposition() As Boolean
         Get
@@ -426,7 +524,54 @@ Public Class TSettings
             FTonalComposition = value
         End Set
     End Property
-
+    Property LMD() As Boolean
+        Get
+            Return FLMD
+        End Get
+        Set(ByVal value As Boolean)
+            FLMD = value
+        End Set
+    End Property
+    Property LDM() As Boolean
+        Get
+            Return FLDM
+        End Get
+        Set(ByVal value As Boolean)
+            FLDM = value
+        End Set
+    End Property
+    Property MLD() As Boolean
+        Get
+            Return FMLD
+        End Get
+        Set(ByVal value As Boolean)
+            FMLD = value
+        End Set
+    End Property
+    Property MDL() As Boolean
+        Get
+            Return FMDL
+        End Get
+        Set(ByVal value As Boolean)
+            FMDL = value
+        End Set
+    End Property
+    Property DML() As Boolean
+        Get
+            Return FDML
+        End Get
+        Set(ByVal value As Boolean)
+            FDML = value
+        End Set
+    End Property
+    Property DLM() As Boolean
+        Get
+            Return FDLM
+        End Get
+        Set(ByVal value As Boolean)
+            FDLM = value
+        End Set
+    End Property
     Property CanvasHeight() As Integer
         Get
             Return FCanvasHeight
