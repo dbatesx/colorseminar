@@ -1,12 +1,11 @@
 
 Public Class FormSettings
-    '    Private Sub btnGOPAINT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
-    '    End Sub
-    'Private Sub clbFOREGROUND_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
-    'End Sub
-
+ 
+    Public rand, comp, dominantcolor, colours(6), canvaswidth, canvasheight As Integer
+    Public colour, sky, background, midground, foreground, scheme As String
+    Public CMBcolors(,,), mycolors(,,), temperature, compu, items, options As String
+    Public sunspot, colorscheme, season, intensity, glaze As String
+    Public design, colortest, key, lines, shapes, summary1, summary2 As String
     Private Sub lbSKY_SelectedIndexChanged_1(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
@@ -25,16 +24,9 @@ Public Class FormSettings
     Private Sub ListBox3_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
-    '
 
-
-    Public rand, comp, dominantcolor, colours(6), canvaswidth, canvasheight As Integer
-    Public colour, sky, background, midground, foreground, scheme, CMBcolors(,,), mycolors(,,), temperature, compu, items, options, sunspot, colorscheme, season, _
-    intensity, glaze, tonalcomp, design, colortest, key, lines, shapes, summary1, summary2 As String
     Public ButtonIndex As Integer
     Private SelectedColors(0 To 18) As Boolean
-
-    '    Private ObjectSeed As Integer
     Private Settings As TSettings = New TSettings
 
     Private Sub obtainrequests()
@@ -58,6 +50,11 @@ Public Class FormSettings
             Settings.Colours(i) = colours(i)
         Next
 
+        Settings.side = 0
+        Settings.darktone = 0
+        Settings.darkcolor = 0
+        Settings.lighttone = 0
+        Settings.lightcolor = 0
 
         If lbCOLORSCHEME.SelectedItems.Count = 0 Or compu = 1 Then
             lbCOLORSCHEME.SetSelected(Rnd() * (lbCOLORSCHEME.Items.Count - 1), True)
@@ -76,7 +73,6 @@ Public Class FormSettings
             Me.lbBACKGROUND.SelectedItems.Clear()
             rand = Rnd() * 4 : lbBACKGROUND.SelectedIndex = rand
         End If
-
         For Each strValue In lbBACKGROUND.SelectedItems
             If strValue = "Big Sky" Then Settings.BigSky = True
             If strValue = "Mountains" Then Settings.Mountains = True
@@ -89,26 +85,24 @@ Public Class FormSettings
         Settings.Mountainous = False
         Settings.RollingHills = False
         Settings.Prairie = False
-        Settings.Lake = False
-        Settings.River = False
         Settings.LocalArea = False
         Settings.Hazy = False
         If (Me.lbMIDGROUND.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbMIDGROUND.SelectedItems.Clear()
-            rand = Rnd() * 6 : lbMIDGROUND.SelectedIndex = rand
+            rand = Rnd() * 4 : lbMIDGROUND.SelectedIndex = rand
         End If
         For Each strValue In lbMIDGROUND.SelectedItems
             If strValue = "Mountainous" Then Settings.Mountainous = True
             If strValue = "Rolling Hills" Then Settings.RollingHills = True
             If strValue = "Prairie" Then Settings.Prairie = True
-            If strValue = "Lake" Then Settings.Lake = True
-            If strValue = "River" Then Settings.River = True
             If strValue = "Local Area" Then Settings.LocalArea = True
             If strValue = "Hazy" Then Settings.Hazy = True
         Next
 
         'foreground
         Settings.Road = False
+        Settings.Lake = False
+        Settings.River = False
         Settings.Waterfall = False
         Settings.Buildings = False
         Settings.Flowers = False
@@ -116,9 +110,11 @@ Public Class FormSettings
         Settings.Nil = False
         If (Me.lbFOREGROUND.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbFOREGROUND.SelectedItems.Clear()
-            rand = Rnd() * 5 : lbFOREGROUND.SelectedIndex = rand
+            rand = Rnd() * 7 : lbFOREGROUND.SelectedIndex = rand
         End If
         For Each strValue In lbFOREGROUND.SelectedItems
+            If strValue = "Lake" Then Settings.Lake = True
+            If strValue = "River" Then Settings.River = True
             If strValue = "Road" Then Settings.Road = True
             If strValue = "Waterfall" Then Settings.Waterfall = True
             If strValue = "Building(s)" Then Settings.Buildings = True
@@ -138,7 +134,7 @@ Public Class FormSettings
         For Each strValue In lbSKY.SelectedItems
             If strValue = "Clear" Then Settings.Clear = True
             If strValue = "Clouds" Then Settings.Clouds = True
-            If strValue = "Overcase" Then Settings.Overcast = True
+            If strValue = "Overcast" Then Settings.Overcast = True
         Next
 
         'season
@@ -172,27 +168,27 @@ Public Class FormSettings
 
         'colortest 
         Settings.Cmb = False
-        Settings.Other = False
+        Settings.TintsShades = False
         Settings.Ntr = False
         For Each strValue In lbCOLORTEST.SelectedItems
-            If strValue = "Cmb" Then Settings.Cmb = True
-            If strValue = "Other" Then Settings.Other = True
+            If strValue = "CMB" Then Settings.Cmb = True
+            If strValue = "Tints/Shades" Then Settings.TintsShades = True
             If strValue = "Ntr" Then Settings.Ntr = True
         Next
 
         'Sun
         Settings.left = False
-        Settings.Central = False
+        Settings.Above = False
         Settings.Right = False
         Settings.Ambient = False
         Settings.Evening = False
         If (Me.lbSUN.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbSUN.SelectedItems.Clear()
-            rand = Rnd() * 3 : lbSUN.SelectedIndex = rand
+            rand = Rnd() * 4 : lbSUN.SelectedIndex = rand
         End If
         For Each strValue In lbSUN.SelectedItems
             If strValue = "Left" Then Settings.left = True
-            If strValue = "Central" Then Settings.Central = True
+            If strValue = "Above" Then Settings.Above = True
             If strValue = "Right" Then Settings.Right = True
             If strValue = "Ambient" Then Settings.Ambient = True
             If strValue = "Evening" Then Settings.Evening = True
@@ -205,6 +201,8 @@ Public Class FormSettings
             rand = Rnd() * 3 : lbKEY.SelectedIndex = rand
             key = lbKEY.SelectedItem
         End If
+        Settings.shanum = Rnd() * 2 + 1
+        Settings.subject = ""
 
         'intensity
         Settings.FullRange = False
@@ -216,19 +214,34 @@ Public Class FormSettings
             rand = Rnd() * 3 : lbINTENSITY.SelectedIndex = rand
         End If
         For Each strValue In lbINTENSITY.SelectedItems
-            If strValue = "FullRange" Then Settings.FullRange = True
-            If strValue = "High" Then Settings.High = True
-            If strValue = "Medium" Then Settings.Medium = True
-            If strValue = "Low" Then Settings.Low = True
+            If strValue = "FullRange" Then Settings.FullRange = True : Settings.Intensity = "Any"
+            If strValue = "High" Then Settings.High = True : Settings.Intensity = "High"
+            If strValue = "Medium" Then Settings.Medium = True : Settings.Intensity = "Medium"
+            If strValue = "Low" Then Settings.Low = True : Settings.Intensity = "Low"
 
         Next
 
-        tonalcomp = ""
-        tonalcomp = lb3TONALCOMP.SelectedItem
-        If (tonalcomp = "" And compu = 2) Or compu = 1 Then
-            rand = Rnd() * 5 : lb3TONALCOMP.SelectedIndex = rand
-            tonalcomp = lb3TONALCOMP.SelectedItem
+        'tonalcomp
+        Settings.Mix = False
+        Settings.LMD = False
+        Settings.LDM = False
+        Settings.MLD = False
+        Settings.MDL = False
+        Settings.DML = False
+        Settings.DLM = False
+        Me.lb3TONALCOMP.SelectedItems.Clear()
+        rand = Rnd() * 5 : lb3TONALCOMP.SelectedIndex = rand
+        If (Me.lb3TONALCOMP.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
         End If
+        For Each strValue In lb3TONALCOMP.SelectedItems
+            If strValue = "Mixed" Then Settings.Mix = True : Settings.tonalcomp = "Mix"
+            If strValue = "Light, mid, dark" Then Settings.LMD = True : Settings.tonalcomp = "123"
+            If strValue = "Light, dark, mid" Then Settings.LDM = True : Settings.tonalcomp = "132"
+            If strValue = "Mid, light, dark" Then Settings.MLD = True : Settings.tonalcomp = "213"
+            If strValue = "Mid, dark, light" Then Settings.MDL = True : Settings.tonalcomp = "231"
+            If strValue = "Dark, mid, light" Then Settings.DML = True : Settings.tonalcomp = "321"
+            If strValue = "Dark, light, mid" Then Settings.DLM = True : Settings.tonalcomp = "312"
+        Next
 
         'determine screen size of painting form
         Dim ratio As Single
@@ -279,7 +292,6 @@ Public Class FormSettings
         '        frm.ObjectSeed = ObjectSeed
         frm.Show()
     End Sub
-
     Private Sub btnREPEAT_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         obtainrequests()
 
@@ -335,8 +347,8 @@ Public Class FormSettings
         Else
             temperature = "cool"
         End If
-
         colorscheme = Strings.Trim(lbCOLORSCHEME.Text)
+
         'If lbCOLORSCHEME.SelectedItems.Count = 0 Or compu = 1 Then
         '    lbCOLORSCHEME.SetSelected(Rnd() * lbCOLORSCHEME.Items.Count-1, True)
         'End If
@@ -347,6 +359,11 @@ Public Class FormSettings
             Case "Monochromatic*"
                 scheme = 0
                 IncludeColor(0)
+            Case "Complementary*"
+                scheme = 1
+                IncludeColor(0)
+                IncludeColor(9)
+                colours(1) = dc + 9
             Case "Triad*"
                 scheme = 2
                 IncludeColor(0)
@@ -354,11 +371,7 @@ Public Class FormSettings
                 IncludeColor(12)
                 colours(1) = dc + 6
                 colours(2) = dc + 12
-            Case "Complementary*"
-                scheme = 1
-                IncludeColor(0)
-                IncludeColor(9)
-                colours(1) = dc + 9
+
             Case "Split Complementary*"
                 scheme = 2
                 IncludeColor(0)
@@ -387,24 +400,24 @@ Public Class FormSettings
                 IncludeColor(17)
                 colours(1) = dc + 1
                 colours(2) = dc + 2
-                colours(3) = dc + 9
-                colours(4) = dc + 16
-                colours(5) = dc + 17
+                colours(3) = dc + 16
+                colours(4) = dc + 17
+                colours(5) = dc + 9 'complementary color
             Case "CMB1"
                 scheme = 10
-                IncludeColor(0)
+                'IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB2"
                 scheme = 11
-                IncludeColor(0)
+                '  IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB3"
                 scheme = 12
-                IncludeColor(0)
+                'IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB4"
                 scheme = 13
-                IncludeColor(0)
+                '  IncludeColor(0)
                 initialize_CMBcolors()
 
         End Select
@@ -556,5 +569,10 @@ Public Class FormSettings
     Private Sub Label3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label3.Click
 
     End Sub
+
+    Private Sub Label11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label11.Click
+
+    End Sub
 End Class
+  
 

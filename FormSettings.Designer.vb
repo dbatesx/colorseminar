@@ -57,8 +57,8 @@ Partial Class FormSettings
         Me.Panel3 = New System.Windows.Forms.Panel
         Me.lbFOREGROUND = New System.Windows.Forms.ListBox
         Me.LColorTest = New System.Windows.Forms.Label
-        Me.lbCOLORTEST = New System.Windows.Forms.ListBox
         Me.Panel4 = New System.Windows.Forms.Panel
+        Me.lbCOLORTEST = New System.Windows.Forms.ListBox
         CType(Me.nudHEIGHT, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nudWIDTH, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
@@ -103,7 +103,7 @@ Partial Class FormSettings
         '
         Me.lbINTENSITY.FormattingEnabled = True
         Me.lbINTENSITY.Items.AddRange(New Object() {"FullRange", "High", "Medium", "Low"})
-        Me.lbINTENSITY.Location = New System.Drawing.Point(57, 215)
+        Me.lbINTENSITY.Location = New System.Drawing.Point(57, 192)
         Me.lbINTENSITY.Name = "lbINTENSITY"
         Me.lbINTENSITY.Size = New System.Drawing.Size(69, 56)
         Me.lbINTENSITY.TabIndex = 82
@@ -112,16 +112,17 @@ Partial Class FormSettings
         '
         Me.Label18.AutoSize = True
         Me.Label18.BackColor = System.Drawing.SystemColors.Control
-        Me.Label18.Location = New System.Drawing.Point(61, 186)
+        Me.Label18.Location = New System.Drawing.Point(38, 176)
         Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(64, 26)
+        Me.Label18.Size = New System.Drawing.Size(110, 13)
         Me.Label18.TabIndex = 81
-        Me.Label18.Text = "  COLOR " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "INTENSITY" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
+        Me.Label18.Text = "  COLOR INTENSITY" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         '
         'Label17
         '
         Me.Label17.AutoSize = True
-        Me.Label17.Location = New System.Drawing.Point(716, 38)
+        Me.Label17.BackColor = System.Drawing.SystemColors.Control
+        Me.Label17.Location = New System.Drawing.Point(27, 257)
         Me.Label17.Name = "Label17"
         Me.Label17.Size = New System.Drawing.Size(121, 13)
         Me.Label17.TabIndex = 80
@@ -130,17 +131,17 @@ Partial Class FormSettings
         'lb3TONALCOMP
         '
         Me.lb3TONALCOMP.FormattingEnabled = True
-        Me.lb3TONALCOMP.Items.AddRange(New Object() {"Light, mid, dark", "Light, dark, mid", "Mid, light, dark", "Mid, dark, light", "Dark, mid, light", "Dark, light, mid"})
-        Me.lb3TONALCOMP.Location = New System.Drawing.Point(718, 58)
+        Me.lb3TONALCOMP.Items.AddRange(New Object() {"Light, mid, dark", "Light, dark, mid", "Mid, light, dark", "Mid, dark, light", "Dark, mid, light", "Dark, light, mid", "Mixed"})
+        Me.lb3TONALCOMP.Location = New System.Drawing.Point(46, 273)
         Me.lb3TONALCOMP.Name = "lb3TONALCOMP"
-        Me.lb3TONALCOMP.Size = New System.Drawing.Size(90, 82)
+        Me.lb3TONALCOMP.Size = New System.Drawing.Size(90, 95)
         Me.lb3TONALCOMP.TabIndex = 79
         '
         'Label14
         '
         Me.Label14.AutoSize = True
         Me.Label14.BackColor = System.Drawing.SystemColors.Control
-        Me.Label14.Location = New System.Drawing.Point(33, 276)
+        Me.Label14.Location = New System.Drawing.Point(721, 45)
         Me.Label14.Name = "Label14"
         Me.Label14.Size = New System.Drawing.Size(116, 26)
         Me.Label14.TabIndex = 74
@@ -150,7 +151,7 @@ Partial Class FormSettings
         '
         Me.lbKEY.FormattingEnabled = True
         Me.lbKEY.Items.AddRange(New Object() {"Full Range", "High", "Medium", "Low"})
-        Me.lbKEY.Location = New System.Drawing.Point(57, 305)
+        Me.lbKEY.Location = New System.Drawing.Point(738, 74)
         Me.lbKEY.Name = "lbKEY"
         Me.lbKEY.Size = New System.Drawing.Size(68, 56)
         Me.lbKEY.TabIndex = 59
@@ -167,8 +168,8 @@ Partial Class FormSettings
         'lbSUN
         '
         Me.lbSUN.FormattingEnabled = True
-        Me.lbSUN.Items.AddRange(New Object() {"Left", "Central", "Right", "Ambient"})
-        Me.lbSUN.Location = New System.Drawing.Point(719, 184)
+        Me.lbSUN.Items.AddRange(New Object() {"Left", "Above", "Right", "Ambient", "Evening"})
+        Me.lbSUN.Location = New System.Drawing.Point(119, 192)
         Me.lbSUN.Name = "lbSUN"
         Me.lbSUN.Size = New System.Drawing.Size(59, 69)
         Me.lbSUN.TabIndex = 70
@@ -176,11 +177,12 @@ Partial Class FormSettings
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(716, 162)
+        Me.Label11.BackColor = System.Drawing.SystemColors.ButtonFace
+        Me.Label11.Location = New System.Drawing.Point(111, 176)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(92, 13)
+        Me.Label11.Size = New System.Drawing.Size(87, 13)
         Me.Label11.TabIndex = 71
-        Me.Label11.Text = "SUN DIRECTION"
+        Me.Label11.Text = "LIGHT SOURCE"
         '
         'lbSEASON
         '
@@ -205,7 +207,7 @@ Partial Class FormSettings
         '
         Me.Label9.AutoSize = True
         Me.Label9.BackColor = System.Drawing.SystemColors.Control
-        Me.Label9.Location = New System.Drawing.Point(124, 177)
+        Me.Label9.Location = New System.Drawing.Point(123, 274)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(55, 13)
         Me.Label9.TabIndex = 67
@@ -252,9 +254,9 @@ Partial Class FormSettings
         Me.Label5.AutoSize = True
         Me.Label5.Location = New System.Drawing.Point(12, 10)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(174, 13)
+        Me.Label5.Size = New System.Drawing.Size(149, 13)
         Me.Label5.TabIndex = 61
-        Me.Label5.Text = "THE BATES COLOR WORKSHOP"
+        Me.Label5.Text = "BATES COLOR WORKSHOP"
         '
         'Label4
         '
@@ -270,15 +272,15 @@ Partial Class FormSettings
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(721, 312)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(132, 26)
+        Me.Label2.Size = New System.Drawing.Size(128, 26)
         Me.Label2.TabIndex = 58
-        Me.Label2.Text = "PAINTING DIMENSIONS " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(RATIO) - Inches or Cm"
+        Me.Label2.Text = "PICTURE DIMENSIONS " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(RATIO) - Inches or Cm"
         '
         'Label1
         '
         Me.Label1.AutoSize = True
         Me.Label1.BackColor = System.Drawing.SystemColors.Control
-        Me.Label1.Location = New System.Drawing.Point(45, 17)
+        Me.Label1.Location = New System.Drawing.Point(44, 17)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(92, 13)
         Me.Label1.TabIndex = 57
@@ -288,7 +290,7 @@ Partial Class FormSettings
         '
         Me.lbCOLORSCHEME.FormattingEnabled = True
         Me.lbCOLORSCHEME.Items.AddRange(New Object() {"Monochromatic*", "Complementary*", "Split Complementary* ", "Triad* ", "Analogous*", "Analogous with Complement*", "CMB1", "CMB2", "CMB3", "CMB4"})
-        Me.lbCOLORSCHEME.Location = New System.Drawing.Point(223, 120)
+        Me.lbCOLORSCHEME.Location = New System.Drawing.Point(21, 33)
         Me.lbCOLORSCHEME.Name = "lbCOLORSCHEME"
         Me.lbCOLORSCHEME.Size = New System.Drawing.Size(151, 134)
         Me.lbCOLORSCHEME.TabIndex = 54
@@ -324,7 +326,8 @@ Partial Class FormSettings
         'Label20
         '
         Me.Label20.AutoSize = True
-        Me.Label20.Location = New System.Drawing.Point(9, 325)
+        Me.Label20.BackColor = System.Drawing.SystemColors.Control
+        Me.Label20.Location = New System.Drawing.Point(8, 215)
         Me.Label20.Name = "Label20"
         Me.Label20.Size = New System.Drawing.Size(87, 13)
         Me.Label20.TabIndex = 92
@@ -336,6 +339,7 @@ Partial Class FormSettings
         Me.lbBACKGROUND.Items.AddRange(New Object() {"Big Sky", "Sea", "Mountains", "Hills", "Indistinct"})
         Me.lbBACKGROUND.Location = New System.Drawing.Point(21, 33)
         Me.lbBACKGROUND.Name = "lbBACKGROUND"
+        Me.lbBACKGROUND.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lbBACKGROUND.Size = New System.Drawing.Size(65, 69)
         Me.lbBACKGROUND.TabIndex = 93
         '
@@ -351,10 +355,10 @@ Partial Class FormSettings
         'lbMIDGROUND
         '
         Me.lbMIDGROUND.FormattingEnabled = True
-        Me.lbMIDGROUND.Items.AddRange(New Object() {"Mountainous", "Rolling Hills", "Prairie", "Lake", "River", "Local Area", "Hazy"})
+        Me.lbMIDGROUND.Items.AddRange(New Object() {"Mountainous", "Rolling Hills", "Prairie", "Local Area", "Hazy"})
         Me.lbMIDGROUND.Location = New System.Drawing.Point(11, 130)
         Me.lbMIDGROUND.Name = "lbMIDGROUND"
-        Me.lbMIDGROUND.Size = New System.Drawing.Size(86, 95)
+        Me.lbMIDGROUND.Size = New System.Drawing.Size(86, 69)
         Me.lbMIDGROUND.TabIndex = 95
         '
         'lbSKY
@@ -380,7 +384,7 @@ Partial Class FormSettings
         '
         Me.lbOPT.FormattingEnabled = True
         Me.lbOPT.Items.AddRange(New Object() {"Fog", "Sunset", "Outlines", "Neither"})
-        Me.lbOPT.Location = New System.Drawing.Point(122, 195)
+        Me.lbOPT.Location = New System.Drawing.Point(119, 294)
         Me.lbOPT.Name = "lbOPT"
         Me.lbOPT.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lbOPT.Size = New System.Drawing.Size(60, 56)
@@ -389,15 +393,16 @@ Partial Class FormSettings
         'Panel3
         '
         Me.Panel3.BackColor = System.Drawing.Color.DarkTurquoise
+        Me.Panel3.Controls.Add(Me.Label11)
         Me.Panel3.Controls.Add(Me.lbFOREGROUND)
-        Me.Panel3.Controls.Add(Me.LColorTest)
-        Me.Panel3.Controls.Add(Me.lbCOLORTEST)
+        Me.Panel3.Controls.Add(Me.Label20)
         Me.Panel3.Controls.Add(Me.lbBACKGROUND)
         Me.Panel3.Controls.Add(Me.lbMIDGROUND)
         Me.Panel3.Controls.Add(Me.lbOPT)
         Me.Panel3.Controls.Add(Me.Label9)
         Me.Panel3.Controls.Add(Me.Label10)
         Me.Panel3.Controls.Add(Me.lbSEASON)
+        Me.Panel3.Controls.Add(Me.lbSUN)
         Me.Panel3.Location = New System.Drawing.Point(4, 87)
         Me.Panel3.Name = "Panel3"
         Me.Panel3.Size = New System.Drawing.Size(210, 376)
@@ -406,44 +411,45 @@ Partial Class FormSettings
         'lbFOREGROUND
         '
         Me.lbFOREGROUND.FormattingEnabled = True
-        Me.lbFOREGROUND.Items.AddRange(New Object() {"Road", "Waterfall", "Building(s)", "Farm Stuff", "Flowers", "Nil"})
-        Me.lbFOREGROUND.Location = New System.Drawing.Point(11, 255)
+        Me.lbFOREGROUND.Items.AddRange(New Object() {"Lake", "River", "Road", "Waterfall", "Building(s)", "Farm Stuff", "Flowers", "Nil"})
+        Me.lbFOREGROUND.Location = New System.Drawing.Point(11, 231)
         Me.lbFOREGROUND.Name = "lbFOREGROUND"
         Me.lbFOREGROUND.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lbFOREGROUND.Size = New System.Drawing.Size(86, 82)
+        Me.lbFOREGROUND.Size = New System.Drawing.Size(86, 108)
         Me.lbFOREGROUND.TabIndex = 98
         '
         'LColorTest
         '
         Me.LColorTest.AutoSize = True
         Me.LColorTest.BackColor = System.Drawing.SystemColors.Control
-        Me.LColorTest.Location = New System.Drawing.Point(115, 274)
+        Me.LColorTest.Location = New System.Drawing.Point(730, 150)
         Me.LColorTest.Name = "LColorTest"
         Me.LColorTest.Size = New System.Drawing.Size(83, 13)
         Me.LColorTest.TabIndex = 83
         Me.LColorTest.Text = "COLOR CHECK"
         '
-        'lbCOLORTEST
-        '
-        Me.lbCOLORTEST.FormattingEnabled = True
-        Me.lbCOLORTEST.Items.AddRange(New Object() {"Cmb", "Other", "Ntr"})
-        Me.lbCOLORTEST.Location = New System.Drawing.Point(123, 294)
-        Me.lbCOLORTEST.Name = "lbCOLORTEST"
-        Me.lbCOLORTEST.Size = New System.Drawing.Size(60, 43)
-        Me.lbCOLORTEST.TabIndex = 97
-        '
         'Panel4
         '
         Me.Panel4.BackColor = System.Drawing.Color.Olive
         Me.Panel4.Controls.Add(Me.Label18)
-        Me.Panel4.Controls.Add(Me.lbINTENSITY)
-        Me.Panel4.Controls.Add(Me.lbKEY)
         Me.Panel4.Controls.Add(Me.Label1)
-        Me.Panel4.Controls.Add(Me.Label14)
+        Me.Panel4.Controls.Add(Me.lbCOLORSCHEME)
+        Me.Panel4.Controls.Add(Me.lbINTENSITY)
+        Me.Panel4.Controls.Add(Me.lb3TONALCOMP)
+        Me.Panel4.Controls.Add(Me.Label17)
         Me.Panel4.Location = New System.Drawing.Point(208, 87)
         Me.Panel4.Name = "Panel4"
         Me.Panel4.Size = New System.Drawing.Size(184, 376)
         Me.Panel4.TabIndex = 99
+        '
+        'lbCOLORTEST
+        '
+        Me.lbCOLORTEST.FormattingEnabled = True
+        Me.lbCOLORTEST.Items.AddRange(New Object() {"Tints/Shades", "CMB", "Ntr"})
+        Me.lbCOLORTEST.Location = New System.Drawing.Point(738, 171)
+        Me.lbCOLORTEST.Name = "lbCOLORTEST"
+        Me.lbCOLORTEST.Size = New System.Drawing.Size(75, 43)
+        Me.lbCOLORTEST.TabIndex = 97
         '
         'FormSettings
         '
@@ -451,20 +457,19 @@ Partial Class FormSettings
         Me.AccessibleDescription = "0"
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(896, 467)
+        Me.ClientSize = New System.Drawing.Size(827, 467)
+        Me.Controls.Add(Me.lbKEY)
         Me.Controls.Add(Me.lbSKY)
+        Me.Controls.Add(Me.LColorTest)
         Me.Controls.Add(Me.Label13)
+        Me.Controls.Add(Me.Label14)
+        Me.Controls.Add(Me.lbCOLORTEST)
         Me.Controls.Add(Me.Label21)
-        Me.Controls.Add(Me.Label20)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Label12)
         Me.Controls.Add(Me.lbCOMPUTER)
         Me.Controls.Add(Me.nudHEIGHT)
         Me.Controls.Add(Me.nudWIDTH)
-        Me.Controls.Add(Me.Label17)
-        Me.Controls.Add(Me.lb3TONALCOMP)
-        Me.Controls.Add(Me.lbSUN)
-        Me.Controls.Add(Me.Label11)
         Me.Controls.Add(Me.Label8)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label6)
@@ -472,7 +477,6 @@ Partial Class FormSettings
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.lbCOLORSCHEME)
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.Panel3)
         Me.Controls.Add(Me.Panel4)
@@ -528,8 +532,8 @@ Partial Class FormSettings
     Friend WithEvents lbOPT As System.Windows.Forms.ListBox
     Friend WithEvents Panel3 As System.Windows.Forms.Panel
     Friend WithEvents Panel4 As System.Windows.Forms.Panel
-    Friend WithEvents lbCOLORTEST As System.Windows.Forms.ListBox
     Friend WithEvents LColorTest As System.Windows.Forms.Label
     Friend WithEvents lbFOREGROUND As System.Windows.Forms.ListBox
+    Friend WithEvents lbCOLORTEST As System.Windows.Forms.ListBox
 
 End Class
