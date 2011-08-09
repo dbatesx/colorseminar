@@ -106,7 +106,7 @@ project2:
 project3:
         If Settings.Project3 = True Then
             'testdistance()
-            golf()
+            makeskyfluffclouds()
 
             Exit Sub
         End If
