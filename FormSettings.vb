@@ -1,10 +1,9 @@
 
 Public Class FormSettings
  
-    Public rand, comp, dominantcolor, colours(6), canvaswidth, canvasheight As Integer
-    Public colour, sky, background, midground, foreground, scheme As String
-    Public CMBcolors(,,), mycolors(,,), temperature, compu, items, options As String
-    Public sunspot, colorscheme, season, intensity, glaze As String
+    Public rand, dominantcolor, colours(6), scheme As Integer
+    Public colour, colorscheme As String
+    Public CMBcolors(,,), mycolors(,,), compu, items, options As String
     Public design, colortest, key, lines, shapes, summary1, summary2 As String
     Private Sub lbSKY_SelectedIndexChanged_1(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
@@ -44,17 +43,12 @@ Public Class FormSettings
             Panel1.Refresh()
         End If
 
-        Settings.DominantColor = dominantcolor
-        Settings.Scheme = scheme
+
         For i = 0 To 5
-            Settings.Colours(i) = colours(i)
+            colours(i) = colours(i)
         Next
 
         Settings.side = 0
-        Settings.darktone = 0
-        Settings.darkcolor = 0
-        Settings.lighttone = 0
-        Settings.lightcolor = 0
 
         If lbCOLORSCHEME.SelectedItems.Count = 0 Or compu = 1 Then
             lbCOLORSCHEME.SetSelected(Rnd() * (lbCOLORSCHEME.Items.Count - 1), True)
@@ -65,62 +59,64 @@ Public Class FormSettings
 
         'background 
         Settings.BigSky = False
-        Settings.Mountains = False
         Settings.Sea = False
-        Settings.Hills = False
-        Settings.Indistinct = False
+
         If (Me.lbBACKGROUND.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbBACKGROUND.SelectedItems.Clear()
-            rand = Rnd() * 4 : lbBACKGROUND.SelectedIndex = rand
+            rand = Rnd() * 1 : lbBACKGROUND.SelectedIndex = rand
         End If
         For Each strValue In lbBACKGROUND.SelectedItems
             If strValue = "Big Sky" Then Settings.BigSky = True
-            If strValue = "Mountains" Then Settings.Mountains = True
             If strValue = "Sea" Then Settings.Sea = True
-            If strValue = "Hills" Then Settings.Hills = True
-            If strValue = "Indistinct" Then Settings.Indistinct = True
         Next
      
         ' midground 
         Settings.Mountainous = False
-        Settings.RollingHills = False
-        Settings.Prairie = False
-        Settings.LocalArea = False
-        Settings.Hazy = False
+        Settings.Hills = False
+        Settings.Flat = False
+
         If (Me.lbMIDGROUND.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbMIDGROUND.SelectedItems.Clear()
-            rand = Rnd() * 4 : lbMIDGROUND.SelectedIndex = rand
+            rand = Rnd() * 2 : lbMIDGROUND.SelectedIndex = rand
         End If
         For Each strValue In lbMIDGROUND.SelectedItems
             If strValue = "Mountainous" Then Settings.Mountainous = True
-            If strValue = "Rolling Hills" Then Settings.RollingHills = True
-            If strValue = "Prairie" Then Settings.Prairie = True
-            If strValue = "Local Area" Then Settings.LocalArea = True
-            If strValue = "Hazy" Then Settings.Hazy = True
+            If strValue = "Hills" Then Settings.Hills = True
+            If strValue = "Flat" Then Settings.Flat = True
         Next
 
         'foreground
-        Settings.Road = False
-        Settings.Lake = False
         Settings.River = False
-        Settings.Waterfall = False
-        Settings.Buildings = False
-        Settings.Flowers = False
-        Settings.Farmstuff = False
-        Settings.Nil = False
+        Settings.Lake = False
+        Settings.Stream = False
+        Settings.Road = False
+        Settings.Trees = False
+        Settings.Neither = False
         If (Me.lbFOREGROUND.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbFOREGROUND.SelectedItems.Clear()
-            rand = Rnd() * 7 : lbFOREGROUND.SelectedIndex = rand
+            rand = Rnd() * 5 : lbFOREGROUND.SelectedIndex = rand
         End If
         For Each strValue In lbFOREGROUND.SelectedItems
-            If strValue = "Lake" Then Settings.Lake = True
             If strValue = "River" Then Settings.River = True
+            If strValue = "Lake" Then Settings.Lake = True
+            If strValue = "Stream" Then Settings.Stream = True
             If strValue = "Road" Then Settings.Road = True
-            If strValue = "Waterfall" Then Settings.Waterfall = True
-            If strValue = "Building(s)" Then Settings.Buildings = True
-            If strValue = "Flowers" Then Settings.Flowers = True
-            If strValue = "Farmstuff" Then Settings.Farmstuff = True
-            If strValue = "Nil" Then Settings.Nil = True
+            If strValue = "Trees" Then Settings.Road = True
+            If strValue = "None" Then Settings.Neither = True
+        Next
+
+        'projects
+        Settings.project1 = False
+        Settings.Project2 = False
+        Settings.Project3 = False
+        Settings.Project4 = False
+        Settings.Nor = False
+        For Each strValue In lbPROJECTS.SelectedItems
+            If strValue = "Project1" Then Settings.project1 = True
+            If strValue = "Project2" Then Settings.Project2 = True
+            If strValue = "Project3" Then Settings.Project3 = True
+            If strValue = "Project4" Then Settings.Project4 = True
+            If strValue = "None" Then Settings.Nor = True
         Next
 
         'sky
@@ -153,94 +149,59 @@ Public Class FormSettings
             If strValue = "Winter" Then Settings.Winter = True
         Next
 
-
         'Options
-        Settings.Fog = False
-        Settings.Sunset = False
         Settings.Outlines = False
-        Settings.Neither = False
-        For Each strValue In lbOPT.SelectedItems
-            If strValue = "Outlines" Then Settings.Outlines = True
-            If strValue = "Fog" Then Settings.Fog = True
-            If strValue = "Neither" Then Settings.Neither = True
+        Settings.Mist = False
+        Settings.Evening = False
+        Settings.LessIntensity = False
+        Settings.Neartrees = False
+
+        For Each strValue In lbOPTONS.SelectedItems
+            If strValue = "Stained Glass" Then Settings.Outlines = True
+            If strValue = "Mist" Then Settings.Mist = True
+            If strValue = "Less Intensity" Then Settings.LessIntensity = True
+            If strValue = "Evening" Then Settings.Evening = True
+            If strValue = "Close Trees" Then Settings.Neartrees = True
         Next
 
+        'Local Scenes
+        Settings.Home = False
+        Settings.Farm = False
+        Settings.Flowers = False
+        Settings.Neither = False
+
+        For Each strValue In lbLOCALSCENES.SelectedItems
+            If strValue = "Home" Then Settings.Home = True
+            If strValue = "Farm" Then Settings.Farm = True
+            If strValue = "Flowers" Then Settings.Flowers = True
+            If strValue = "Neither" Then Settings.Neither = True
+
+        Next
 
         'colortest 
         Settings.Cmb = False
         Settings.TintsShades = False
-        Settings.Ntr = False
+        Settings.Nor = False
+        Settings.Colorcode = False
         For Each strValue In lbCOLORTEST.SelectedItems
             If strValue = "CMB" Then Settings.Cmb = True
             If strValue = "Tints/Shades" Then Settings.TintsShades = True
-            If strValue = "Ntr" Then Settings.Ntr = True
+            If strValue = "Color Codes" Then Settings.Colorcode = True
+            If strValue = "Neither" Then Settings.Nor = True
         Next
 
         'Sun
         Settings.left = False
         Settings.Above = False
         Settings.Right = False
-        Settings.Ambient = False
-        Settings.Evening = False
         If (Me.lbSUN.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
             Me.lbSUN.SelectedItems.Clear()
-            rand = Rnd() * 4 : lbSUN.SelectedIndex = rand
+            rand = Rnd() * 2 : lbSUN.SelectedIndex = rand
         End If
         For Each strValue In lbSUN.SelectedItems
             If strValue = "Left" Then Settings.left = True
             If strValue = "Above" Then Settings.Above = True
             If strValue = "Right" Then Settings.Right = True
-            If strValue = "Ambient" Then Settings.Ambient = True
-            If strValue = "Evening" Then Settings.Evening = True
-        Next
-
-
-        key = ""
-        key = lbKEY.SelectedItem
-        If (key = "" And compu = 2) Or compu = 1 Then
-            rand = Rnd() * 3 : lbKEY.SelectedIndex = rand
-            key = lbKEY.SelectedItem
-        End If
-        Settings.shanum = Rnd() * 2 + 1
-        Settings.subject = ""
-
-        'intensity
-        Settings.FullRange = False
-        Settings.High = False
-        Settings.Medium = False
-        Settings.Low = False
-        If (Me.lbINTENSITY.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
-            Me.lbINTENSITY.SelectedItems.Clear()
-            rand = Rnd() * 3 : lbINTENSITY.SelectedIndex = rand
-        End If
-        For Each strValue In lbINTENSITY.SelectedItems
-            If strValue = "FullRange" Then Settings.FullRange = True : Settings.Intensity = "Any"
-            If strValue = "High" Then Settings.High = True : Settings.Intensity = "High"
-            If strValue = "Medium" Then Settings.Medium = True : Settings.Intensity = "Medium"
-            If strValue = "Low" Then Settings.Low = True : Settings.Intensity = "Low"
-
-        Next
-
-        'tonalcomp
-        Settings.Mix = False
-        Settings.LMD = False
-        Settings.LDM = False
-        Settings.MLD = False
-        Settings.MDL = False
-        Settings.DML = False
-        Settings.DLM = False
-        Me.lb3TONALCOMP.SelectedItems.Clear()
-        rand = Rnd() * 5 : lb3TONALCOMP.SelectedIndex = rand
-        If (Me.lb3TONALCOMP.SelectedIndex = -1 And compu = 2) Or compu = 1 Then
-        End If
-        For Each strValue In lb3TONALCOMP.SelectedItems
-            If strValue = "Mixed" Then Settings.Mix = True : Settings.tonalcomp = "Mix"
-            If strValue = "Light, mid, dark" Then Settings.LMD = True : Settings.tonalcomp = "123"
-            If strValue = "Light, dark, mid" Then Settings.LDM = True : Settings.tonalcomp = "132"
-            If strValue = "Mid, light, dark" Then Settings.MLD = True : Settings.tonalcomp = "213"
-            If strValue = "Mid, dark, light" Then Settings.MDL = True : Settings.tonalcomp = "231"
-            If strValue = "Dark, mid, light" Then Settings.DML = True : Settings.tonalcomp = "321"
-            If strValue = "Dark, light, mid" Then Settings.DLM = True : Settings.tonalcomp = "312"
         Next
 
         'determine screen size of painting form
@@ -301,19 +262,6 @@ Public Class FormSettings
         frm.Show()
     End Sub
 
-
-    'Public Sub summary()
-    '    summary1 = "A(n) " & scenes & " painting with " & items & " and " & options & _
-    '           " using a " & colorscheme & " color scheme with " _
-    '    & colour & " being a main color. "
-
-    '    summary2 = "There may also be a " & key & " key of values " & _
-    '     intensity & " color intensity in a " _
-    '     & design & " design and tonal composition of " & tonalcomp & ".  "
-    '    MsgBox(summary1 & summary2)
-
-    'End Sub
-
     Private Sub FormSettings_Deactivate(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Deactivate
         '        obtainrequests()
     End Sub
@@ -342,19 +290,18 @@ Public Class FormSettings
         dominantcolor = ButtonIndex
         If dominantcolor > 18 Then dominantcolor -= 18
         colour = colorname(dominantcolor)
-        If dominantcolor < 8 Or dominantcolor > 16 Then
-            temperature = "warm"
-        Else
-            temperature = "cool"
-        End If
+        
         colorscheme = Strings.Trim(lbCOLORSCHEME.Text)
 
         'If lbCOLORSCHEME.SelectedItems.Count = 0 Or compu = 1 Then
         '    lbCOLORSCHEME.SetSelected(Rnd() * lbCOLORSCHEME.Items.Count-1, True)
         'End If
         Dim dc As Integer = dominantcolor
-
         colours(0) = dc
+        For n As Integer = 1 To 5
+            colours(n) = 0
+        Next
+
         Select Case colorscheme
             Case "Monochromatic*"
                 scheme = 0
@@ -371,7 +318,6 @@ Public Class FormSettings
                 IncludeColor(12)
                 colours(1) = dc + 6
                 colours(2) = dc + 12
-
             Case "Split Complementary*"
                 scheme = 2
                 IncludeColor(0)
@@ -405,19 +351,15 @@ Public Class FormSettings
                 colours(5) = dc + 9 'complementary color
             Case "CMB1"
                 scheme = 10
-                'IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB2"
                 scheme = 11
-                '  IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB3"
                 scheme = 12
-                'IncludeColor(0)
                 initialize_CMBcolors()
             Case "CMB4"
                 scheme = 13
-                '  IncludeColor(0)
                 initialize_CMBcolors()
 
         End Select
@@ -444,43 +386,44 @@ Public Class FormSettings
         For i As Integer = 0 To 359 Step 20
 
             patch = i / 20 + 1
-            brush.Color = modColors.getcolor(patch, 1, 5)
+            'brush.Color = modColors.getcolor(patch, 1, 5)
             'initialize_cmbcolors()
             If patch = 1 Then ' lighter yellow
                 brush.Color = Color.FromArgb(239, 239, 0)
-            End If
-            If patch = 2 Then  'lighter orange-yellow
+            ElseIf patch = 2 Then 'lighter orange-yellow
                 brush.Color = Color.FromArgb(240, 213, 0)
-            End If
-            If patch = 3 Then  'lighter yellow-orange
-                brush.Color = Color.FromArgb(227, 178, 1)
-            End If
-            If patch = 4 Then  'lighter orange
-                brush.Color = Color.FromArgb(252, 130, 10)
-            End If
-            If patch = 5 Then  'lighter red-orange
-                brush.Color = Color.FromArgb(250, 100, 10)
-            End If
-            If patch = 7 Then  'darker red
-                brush.Color = Color.FromArgb(255, 40, 40)
-            End If
-            If patch = 9 Then  'darker red-purple
-                brush.Color = Color.FromArgb(230, 0, 230)
-            End If
-            If patch = 13 Then  'darker blue
-                brush.Color = Color.FromArgb(88, 88, 255)
-            End If
-            If patch = 18 Then  'lighter green-yellow
-                brush.Color = Color.FromArgb(185, 231, 0)
-            End If
-            If patch = 17 Then  'lighter yellow-green
-                brush.Color = Color.FromArgb(113, 224, 0)
-            End If
-            If patch = 16 Then  'lighter green
+            ElseIf patch = 3 Then  'lighter yellow-orange
+                brush.Color = Color.FromArgb(255, 170, 0)
+            ElseIf patch = 4 Then  ' orange
+                brush.Color = Color.FromArgb(255, 140, 27)
+            ElseIf patch = 5 Then  ' red-orange
+                brush.Color = Color.FromArgb(255, 136, 14)
+            ElseIf patch = 6 Then 'orange-red
+                brush.Color = Color.FromArgb(255, 95, 28)
+            ElseIf patch = 7 Then  'red
+                brush.Color = Color.FromArgb(255, 50, 50)
+            ElseIf patch = 8 Then 'purple-red
+                brush.Color = Color.FromArgb(255, 0, 106)
+            ElseIf patch = 9 Then  ' red-purple
+                brush.Color = Color.FromArgb(255, 0, 170)
+            ElseIf patch = 10 Then 'purple
+                brush.Color = Color.FromArgb(240, 0, 240)
+            ElseIf patch = 11 Then 'blue-purple
+                brush.Color = Color.FromArgb(220, 0, 255)
+            ElseIf patch = 12 Then 'purple-blue
+                brush.Color = Color.FromArgb(185, 45, 255)
+            ElseIf patch = 13 Then  ' blue
+                brush.Color = Color.FromArgb(96, 96, 255)
+            ElseIf patch = 14 Then 'green-blue
+                brush.Color = Color.FromArgb(0, 180, 215)
+            ElseIf patch = 15 Then  'blue-green
+                brush.Color = Color.FromArgb(0, 201, 168)
+            ElseIf patch = 16 Then  ' green
                 brush.Color = Color.FromArgb(0, 225, 0)
-            End If
-            If patch = 15 Then  'lighter blue-green
-                brush.Color = Color.FromArgb(0, 185, 170)
+            ElseIf patch = 17 Then  ' yellow-green
+                brush.Color = Color.FromArgb(132, 226, 0)
+            ElseIf patch = 18 Then  'lighter green-yellow
+                brush.Color = Color.FromArgb(185, 231, 0)
             End If
 
             Dim path As New Drawing2D.GraphicsPath
@@ -520,20 +463,18 @@ Public Class FormSettings
 
     End Sub
 
-    Private Sub Label18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label18.Click
+    Private Sub Label18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
 
-    Private Sub lbOPTIONS_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbOPT.SelectedIndexChanged
+    Private Sub lbOPTIONS_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbOPTONS.SelectedIndexChanged
 
     End Sub
 
     Private Sub lbSKY_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbSKY.SelectedIndexChanged
 
     End Sub
-    Private Sub lbINTENSITY_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbINTENSITY.SelectedIndexChanged
-
-    End Sub
+ 
     Private Sub lbSEASON_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbSEASON.SelectedIndexChanged
 
     End Sub
@@ -554,7 +495,7 @@ Public Class FormSettings
 
     End Sub
 
-    Private Sub lbKEY_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbKEY.SelectedIndexChanged
+    Private Sub lbKEY_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbPROJECTS.SelectedIndexChanged
 
     End Sub
 
@@ -571,6 +512,10 @@ Public Class FormSettings
     End Sub
 
     Private Sub Label11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label11.Click
+
+    End Sub
+
+    Private Sub Label15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label15.Click
 
     End Sub
 End Class

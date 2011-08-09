@@ -93,9 +93,10 @@ Partial Class FormPainting
         '
         'PictureBox1
         '
+        Me.PictureBox1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PictureBox1.Location = New System.Drawing.Point(0, 24)
         Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(292, 292)
+        Me.PictureBox1.Size = New System.Drawing.Size(292, 242)
         Me.PictureBox1.TabIndex = 3
         Me.PictureBox1.TabStop = False
         '
