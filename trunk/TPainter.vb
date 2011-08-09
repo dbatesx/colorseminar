@@ -1,6 +1,7 @@
 Imports ColorWorkshop.modColors, ColorWorkshop.modCMBcolors
 
 Public Class TPainter
+    Private bottom As Integer
     Private g As Graphics = Nothing
     Private FImage As Image = Nothing
     Private FSettings As TSettings = Nothing
@@ -20,6 +21,8 @@ Public Class TPainter
     Dim doorx, doorox, wtoplx, wtoprx, fdepthx, fdepthy, Bx, By, Cx, Cy, Dx, Dy, Ex, Ey, Fx, Fy, ff, Ix, Iy, _
     newAx, newAy, roofpty, lastmountainy As Single
     Dim stainedglasspen As New Pen(Color.Black, 1)
+    Dim outlinepen As New Pen(Color.Black, 2)
+    Dim colormem, skycolor, membasey, mem_x, mem_y As Integer
     Dim aerial, color14, M_color, M_gray, M_light, Mred, Mgreen, Mblue, tone, zAy, zFy, found, _
     LVP, RVP, RVPM, LVPM, distance, Ax, Ay, multib, gap As Integer
     Dim rooflttone, roofdktone, roofltcolor, roofdkcolor, chimneylttone, chimneyltcolor, _
@@ -64,15 +67,12 @@ Public Class TPainter
 SingleEvents:
         If Settings.Cmb = True Then CMBcolordisplay() : Exit Sub
         If Settings.TintsShades = True Then colordisplayreg() : Exit Sub
+        If Settings.Colorcode = True Then If FormSettings.scheme = 0 Then colorcode() : Exit Sub
 
-TrialsAndTribulations:
-        Dim xt As Integer = 0
-        If xt = 1 Then Trials()
-     
 ThePainting:
 
 Horizon:
-        If Settings.BigSky = True Then
+        If Settings.bigsky = True Then
             horizon = randh(Image.Height / 2, Image.Height * 0.75)
         Else
             horizon = randh(50, Image.Height * 0.5)
@@ -82,8 +82,47 @@ VanishingPts:
         Dim vp As Integer = randh(400, 700)
         RVP = vp
         LVP = RVP - 1200
-       
 
+TrialsAndTribulations:
+        '__________________________________________
+project1: If Settings.project1 = True Then
+            Dim x0, y0, wid0, hgt0, botwidth, n As Integer
+            x0 = 0 : y0 = 100 : wid0 = 125 : hgt0 = 250 : botwidth = wid0 / 10
+            For n = 1 To 6
+                rivertrees(x0, y0, wid0, hgt0)
+                newtreetrunks(x0 + wid0 / 1.7, y0 + hgt0, botwidth, hgt0)
+                x0 += 160
+            Next
+            Exit Sub
+        End If
+
+project2:
+        If Settings.Project2 = True Then
+            'colortestlarge()
+            deciduous()
+            Exit Sub
+        End If
+
+project3:
+        If Settings.Project3 = True Then
+            'testdistance()
+            golf()
+
+            Exit Sub
+        End If
+
+project4:
+        If Settings.Project4 = True Then
+            Flower()
+            Exit Sub
+        End If
+        '________________________________________
+
+        If Settings.Flowers = True Then
+
+        End If
+
+BeginningofLandscapePainting:
 Sky:
         makeskycolor()
         If Settings.Clear = True Or Settings.Overcast = True Then
@@ -99,26 +138,23 @@ Sky:
             If yrand(10) > 2 Then makeskycumulusclouds()
         End If
 
-        If Settings.Sunset = True Then
-            makeskyevening()
-        End If
-
 BackgroundMountains:
-        If Settings.Mountains = True Then
+        If Settings.Mountainous = True Then
             makehorizonmountains()
         End If
-       
+
 Sea_or_land:
         If Settings.Sea = True Then
             makeocean()
             makeskyfluffclouds()
         Else
-            makeland()
+            makeland(1)
         End If
+        If Settings.Mist = True Then makemist(5)
 
 DistantMountains:
-        If Settings.Mountains = True Then makedistantmountains()
-
+        If Settings.Mountainous = True Then makedistantmountains()
+        If Settings.Mist = True Then makemist(5)
 
 MajorMountain:
         If Settings.Mountainous = True Then
@@ -126,89 +162,605 @@ MajorMountain:
         End If
 
 RollingHills:
-        If Settings.RollingHills = True And Settings.River = False Then rollinghill()
+        If Settings.Hills = True And Settings.River = False Then rollinghill()
 
 Prairie:
-        If Settings.Prairie = True And Settings.River = False Then
+        If Settings.Flat = True And Settings.River = False Then
+
         End If
 
-Hazy:
-        If Settings.Hazy = True Then
+Localscenes:
+        If Settings.Home = True Then
+            homes()
+            Exit Sub
         End If
 
-        If Settings.Buildings = True Then GoTo Buildings
-
+        If Settings.Farm = True Then
+            'nothing here yet
+        End If
 River:
-        If Settings.River = True Then
+        If Settings.River = True Or Settings.Stream = True Then
             makeriveraswinding()
             If Settings.Mountainous = True Then
                 makerivermountains(randh(17, 30))   'mountainous
-            ElseIf Settings.Prairie = True Then
+            ElseIf Settings.Flat = True Then
                 makerivermountains(0)               'prairie
             Else : makerivermountains(randh(6, 13)) 'rolling hills
             End If
 
-            If yrand(100) > 30 Then
-                makerivertrees()
+
+
+            Dim ifn As Integer = yrand(100)
+            If ifn > 30 And ifn < 50 Then makerivertrees()
+            If Settings.Mist = True Then makemist(5)
+            If ifn > 70 Then lonepine() : lonepine()
+            If ifn < 20 Then birchstand()
+            Dim gt As Integer = randh(200, 600)
+            If ifn > 20 And ifn < 30 Then
+                If gt > 580 Then
+                    bush(gt, Image.Height, 50)
+                End If
             End If
         End If
 
-LocalScene:
-        If Settings.LocalArea = True Then
-            'nothing yet
+
+    End Sub
+    Private Sub golf()
+        Dim holedistance, totwindstrength, windstrength, hole_elevation, distance_w_elev, _
+        rough_lie, spin, clubpower, windlieclub As Integer
+        Dim roughclub, windfactor, factor1, Ffactor, difference, fdifference As Single
+        Dim clubselection As String = "5i"
+        Dim winddirection As String = "into"
+        Dim swingselection As String = "chip"
+        Dim fullclubselection As String
+        Dim holeID As String
+        Dim a, b As String
+        b = "_________________________________________________________________________________"
+
+Enterdetails:
+
+        'Enter the following details
+        holeID = "Kiawah 7"
+        hole_elevation = 7      'in feet
+        holedistance = 29      'in yards
+        totwindstrength = 0    'in mph. 
+        windstrength = 0       'Remember how you got it for formula.
+        winddirection = "into"    '(i means facing into the wind, "w"(with)means the wind is coming from behind you.)
+        clubselection = "PW"    'select details from below
+        swingselection = "pitch" ' out of full, pitch, punch, chip
+        clubpower = 37
+        spin = 0    '(out of 3, more spin = 3)
+        rough_lie = 0
+
+        a = "____________________________________________________________________________________"
+
+        'ClubPower:  
+        '        Club   Full    Punch   Pitch   Chip    Flop
+        '        D      235     205
+        '        3WD    222     206
+        '        3H     202     190
+        '        3i     200     185     85
+        '        4i     187     170     69
+        '        5i     175     155     60      41
+        '        6i     160     143     56      36
+        '        7i     145     128     50      31
+        '        8i     130     115     45      27
+        '        9i     120     107     41      24  
+        '        PW     110     95      37      20
+        '        SW     70      59      22      11      24
+        '        60W    55      45      15      7       18
+
+
+        fullclubselection = clubselection + "   " + CStr(clubpower) + " "
+
+EFFECTS_ON_HOLE_DISTANCE:
+
+Elevation_Effects:
+        'usually measured in feet but is also seen in inches.  The importance of small distances remains to be seen.
+        'I presently do not know how to make use of this factor in determining how much power a ball should be hit with.
+        'therefore I deal with theories and trials.
+        'maybe use angle from ball to hole and multiply
+        Dim s_elevation_factor As String = "D=D+or-elev"
+
+        If hole_elevation > 0 Then distance_w_elev = holedistance + hole_elevation
+        If hole_elevation < 0.1 Then distance_w_elev = holedistance - hole_elevation
+
+EFFECTS_ON_CLUB_DISTANCE:
+
+RoughLie_Effects:  'the rough_lie factor reduces the distance of the club
+
+        Dim s_roughfactor As String = "1st no.%"
+        roughclub = clubpower - rough_lie 'lie = either 10,20,30,40 etc, the first number of the lie.
+
+Wind_Effects:
+        'determining windfactor and the new yardage capacity or clubpower of the club, winddegrees will be used later.
+        'will likely be providing more accurate estimates of wind with an against me, but presently just taking 75% of share to affect the ball flight.
+
+        Dim s_windportion As String = CStr(windstrength) + "/" + CStr(totwindstrength)
+
+        If winddirection = "with" Then windfactor = (0.005 * windstrength) + 1
+        If winddirection = "into" Then windfactor = (100 - windstrength) / 100
+
+        windlieclub = roughclub * windfactor
+
+SpinEffects:
+        'waiting to find out what these effects might on the flight distance of the golf ball
+
+Difference:  'between modified club potential and modified distance to hole:
+
+        difference = windlieclub - distance_w_elev
+
+Factors:  'to work with to help to eliminate the difference between demand and capability
+        'can play with this.  Working with the difference alone did not help in the beginning
+
+        factor1 = 0.5
+        fdifference = difference * factor1
+
+        Ffactor = fdifference / windlieclub
+
+        Ffactor = Ffactor * 10 'brings it to tenths of a centimeter
+        'what portion of power bar to stop at, thereby reducing 
+
+Convert_to_Strings:
+
+        Dim s_factor1 As String = CStr(factor1)
+        Dim s_ffactor As String = CStr(Ffactor)
+        Dim s_holeelevation As String = CStr(hole_elevation)
+        Dim s_holedistance As String = CStr(holedistance)
+        Dim s_windstrength As String = CStr(windstrength)
+        Dim s_winddirection As String = CStr(winddirection)
+        Dim s_clubselection As String = CStr(clubselection)
+        Dim s_fullclubselection As String = CStr(fullclubselection)
+        Dim s_rough_lie As String = CStr(rough_lie)
+        Dim s_clubpower As String = CStr(clubpower)
+        Dim s_roughclub As String = CStr(roughclub)
+        Dim s_windlieclub As String = CStr(windlieclub)
+        Dim s_spin As String = CStr(spin)
+        Dim s_swingselection As String = CStr(swingselection)
+        Dim s_difference As String = CStr(difference)
+        Dim s_distance_w_elev As String = CStr(distance_w_elev)
+
+Finalsummary:
+        Dim s_endclubsummary As String = "No comment"
+        'the club along with its reduced power swing, or a statement that a lower numbered club be used.
+        If Ffactor >= -0.0 Then
+            s_endclubsummary = s_swingselection + "  " + clubselection + "  " + s_ffactor
+        ElseIf Ffactor < 0 Then
+            s_endclubsummary = "Choose a higher club this hole"
         End If
 
-Buildings:
-        If Settings.Buildings = True Then
-            If yrand(10) > 5 Then 'single building
-                setupbuildingcolors()
-                rowhousetype = "single"
-                placebuilding("single")
+        Dim para00 As String = "Hole Challenge:------------------" + holeID
+        Dim para01 As String = "Club Considered:--------------------------------------------------------  " + s_fullclubselection
+        Dim para1a As String = "Swing selection:------------------------------------------------  " + s_swingselection
+        Dim para02 As String = "Distance to hole:-------------------------------------------------------------------------  " + s_holedistance
+        Dim para03 As String = "Hole elevation:---------------------------------------------------  " + s_holeelevation
+        Dim para04 As String = "Elevation factor applied to distance-------------  " + s_elevation_factor
+        Dim para05 As String = "New distance from elevation factor--------------------------------------------------  " + s_distance_w_elev
+        Dim para06 As String = "Rough/Sand lie:-------------------------------------------------  " + s_rough_lie
+        Dim para07 As String = "Rough or Sand factor:------------------------------  " + s_roughfactor
+        Dim para08 As String = "Changed club from Rough/Sand:------------------------------------------  " + s_roughclub
+        Dim para09 As String = "Wind direction used:-------------------------------------------  " + s_winddirection
+        Dim para10 As String = "Wind strength (portion used out of total):----------------  " + s_windportion
+        Dim para11 As String = "Changed club from wind:-----------------------------------------------------  " + s_windlieclub
+        Dim para12 As String = "Difference bet. final club and hole distance:---------------------  " + s_difference
+        Dim para13 As String = "Factor1 to manipulate the difference-------------  " + s_factor1
+        Dim para14 As String = "Factor2: Final difference/Final club,*10--------------  " + s_ffactor
+        Dim para15 As String = "Recommendations re club:-----------------------------------------------  " + s_endclubsummary
+        Dim para16 As String = "Make certain hole marker is adjusted for wind effects and green approach to the hole"
+        Dim para17 As String = "Record results below of golf stroke, showing cut or slice and landing and ending results:"
 
-            Else 'rowhousing
-                Dim van, r, ht As Integer
-                r = randsign()
-                van = randh(5, 50) * r
 
-                For multib = 0 To 7
-                    ht = randh(0, 2)
-                    If ht = 0 Then
-                        rht = "withdoorstep"
-                    ElseIf ht = 1 Then
-                        rht = "withlowdeck"
-                    ElseIf ht = 2 Then
-                        rht = "withoutdeckorstep"
-                    End If
-                    rowhousetype = rht
+        Dim aFont As New System.Drawing.Font(" Arial", 10, FontStyle.Bold)
+        g.DrawString(para00, aFont, Brushes.Black, 55, 29)
+        g.DrawString(para01, aFont, Brushes.Black, 75, 50)
+        g.DrawString(para1a, aFont, Brushes.Black, 75, 71)
+        g.DrawString(para02, aFont, Brushes.Black, 75, 92)
+        g.DrawString(para03, aFont, Brushes.Black, 75, 113)
+        g.DrawString(para04, aFont, Brushes.Black, 75, 134)
+        g.DrawString(para05, aFont, Brushes.Black, 75, 155)
+        g.DrawString(para06, aFont, Brushes.Black, 75, 176)
+        g.DrawString(para07, aFont, Brushes.Black, 75, 197)
+        g.DrawString(para08, aFont, Brushes.Black, 75, 218)
+        g.DrawString(para09, aFont, Brushes.Black, 75, 239)
+        g.DrawString(para10, aFont, Brushes.Black, 75, 260)
+        g.DrawString(para11, aFont, Brushes.Black, 75, 281)
+        g.DrawString(para12, aFont, Brushes.Black, 75, 302)
+        g.DrawString(para13, aFont, Brushes.Black, 75, 323)
+        g.DrawString(para14, aFont, Brushes.Black, 75, 344)
+        g.DrawString(para15, aFont, Brushes.Black, 75, 365)
+        g.DrawString(para16, aFont, Brushes.Black, 75, 410)
+        g.DrawString(para17, aFont, Brushes.Black, 75, 431)
 
-                    RVP = RVP + van
-                    setupbuildingcolors()
-                    placebuilding("inline")
+
+    End Sub
+    Private Sub testdistance() '        using simple right angle style - or railway track
+        'width = (lessht / landht) * bottomwidth
+        g.DrawLine(Pens.Green, 0, horizon, Image.Width, horizon)
+        Dim x0, beginy, incY, i, j, riverwidth, sway, maxsway As Integer
+        Dim bottomwidth, y0, lessht, landht As Integer
+        Dim treehgt, p_treeht, p_treewth, x0t, y0t, x, botwidth As Integer
+        Dim rwidth, dfactor, rivpointL_x(21), rivpointL_y(21), rivpointR_x(21), rivpointR_y(21), strleftx(21), strlefty(21), strrightx(21), strrighty(21) As Single
+        Dim box1 As New Rectangle
+        Dim box2 As New Rectangle
+        Dim river_path As New Drawing2D.GraphicsPath
+        horizon = 290
+        beginy = horizon + yrand(3) + 1
+        y0 = beginy
+        x0 = randh(Image.Width * 0.1, Image.Width * 0.4)
+        bottomwidth = 700 'pixels
+        riverwidth = 70 'feet across the river
+        landht = Image.Height - horizon
+        incY = landht / 40
+        dfactor = bottomwidth / landht
+        maxsway = 20 'rwidth / 8
+
+        For i = 0 To 20
+            lessht = y0 - horizon '                        
+            rwidth = lessht * dfactor
+            sway = rwidth * ((randh(-maxsway, maxsway) / 60)) * ((20 - j) / 20)
+            x0 += sway
+            strleftx(i) = x0
+            strlefty(i) = y0
+            strrightx(i) = x0 + rwidth '+ sway
+            strrighty(i) = y0
+            y0 += incY + i * 2
+        Next i
+        'For riverwidth2 As Integer = 1 To 2
+        '
+        Dim point0 As New Point(strleftx(0), strlefty(0))
+        Dim point1 As New Point(strleftx(0) - yrand(5), strlefty(1))
+        Dim point2 As New Point(strleftx(2), strlefty(2))
+        Dim point3 As New Point(strleftx(2) - yrand(5), strlefty(3))
+        Dim point4 As New Point(strleftx(4), strlefty(4))
+        Dim point5 As New Point(strleftx(4) - yrand(5), strlefty(5))
+        Dim point6 As New Point(strleftx(6), strlefty(6))
+        Dim point7 As New Point(strleftx(6) - yrand(6), strlefty(7))
+        Dim point8 As New Point(strleftx(8), strlefty(8))
+        Dim point9 As New Point(strleftx(8) - yrand(8), strlefty(9))
+        Dim point10 As New Point(strleftx(10), strlefty(10))
+        Dim point11 As New Point(strleftx(10) - yrand(10), strlefty(11))
+        Dim point12 As New Point(strleftx(12), strlefty(12))
+        Dim point13 As New Point(strleftx(12) - yrand(12), strlefty(13))
+        Dim point14 As New Point(strleftx(14), strlefty(14))
+        Dim point15 As New Point(strleftx(14) - yrand(14), strlefty(15))
+        Dim point16 As New Point(strleftx(16), strlefty(16))
+        Dim point17 As New Point(strleftx(16) - yrand(16), strlefty(17))
+        Dim point18 As New Point(strleftx(18), strlefty(18))
+        Dim point19 As New Point(strleftx(18) - yrand(18), strlefty(19))
+        Dim point20 As New Point(strleftx(20), strlefty(20))
+
+        Dim point21 As New Point(strrightx(0), strrighty(0))
+        Dim point22 As New Point(strrightx(1), strrighty(1))
+        Dim point23 As New Point(strrightx(1) + yrand(5), strrighty(2))
+        Dim point24 As New Point(strrightx(3), strrighty(3))
+        Dim point25 As New Point(strrightx(4), strrighty(4))
+        Dim point26 As New Point(strrightx(5), strrighty(5))
+        Dim point27 As New Point(strrightx(6), strrighty(6))
+        Dim point28 As New Point(strrightx(7), strrighty(7))
+        Dim point29 As New Point(strrightx(8), strrighty(8))
+        Dim point30 As New Point(strrightx(9), strrighty(9))
+        Dim point31 As New Point(strrightx(10), strrighty(10))
+        Dim point32 As New Point(strrightx(11), strrighty(11))
+        Dim point33 As New Point(strrightx(12), strrighty(12))
+        Dim point34 As New Point(strrightx(13), strrighty(13))
+        Dim point35 As New Point(strrightx(14), strrighty(14))
+        Dim point36 As New Point(strrightx(15), strrighty(15))
+        Dim point37 As New Point(strrightx(16), strrighty(16))
+        Dim point38 As New Point(strrightx(17), strrighty(17))
+        Dim point39 As New Point(strrightx(18), strrighty(18))
+        Dim point40 As New Point(strrightx(19), strrighty(19))
+        Dim point41 As New Point(strrightx(20), strrighty(20))
+
+        ' follow river edge down on left side then up on right side for best computer line curvature
+
+        'Dim rivercurvePoints As Point() = {point0, point1, point2, point3, point4, _
+        'point5, point6, point7, point8, point9, point10, point11, point12, _
+        'point13, point14, point15, point16, point17, point18, point19, point20, _
+        'point41, point40, point39, point38, point37, point36, point35, point34, _
+        'point33, point32, point31, point30, point29, point28, point27, point26, _
+        'point25, point24, point23, point22, point21}
+
+        Dim rivercurvePoints As Point() = {point0, point2, point4, _
+                point6, point8, point10, point12, _
+                point14, point16, point18, point20, _
+                point41, point39, point37, point35, _
+                point33, point31, point29, point27, _
+                point25, point23, point21}
+
+        river_path = New Drawing2D.GraphicsPath
+        river_path.AddCurve(rivercurvePoints, 0.2)
+        ' beach_path
+        'height = 10
+        'box1 = New Rectangle(x0, y0, rwidth, height)
+        'g.FillRectangle(Brushes.Blue, box1)
+        g.SetClip(river_path)
+        Dim fpht As Single = river_path.GetBounds.Height
+        colorblend(river_path.GetBounds.X, river_path.GetBounds.Y, _
+        river_path.GetBounds.Width, river_path.GetBounds.Height, "river", 0)
+        g.ResetClip()
+        'For i = 0 To 20
+        '    box1 = New Rectangle(strleftx(i), strlefty(i), 5, 5)
+        '    box2 = New Rectangle(strrightx(i), strrighty(i), 5, 5)
+        '    g.FillRectangle(Brushes.Red, box1)
+        '    g.FillRectangle(Brushes.Red, box2)
+        'Next
+        '       place rivertrees:
+        For i = 0 To 20
+            If i = 10 Or i = 5 Or i = 15 Then
+                For x = 1 To 2
+                    treehgt = 60 'ft
+                    p_treeht = (treehgt / riverwidth) * (lessht * dfactor)
+                    p_treewth = p_treeht * 0.4
+                    x0t = x0 - p_treewth : If x = 2 Then x0t = x0 + rwidth + p_treewth
+                    y0t = y0 - p_treeht
+                    botwidth = p_treewth / 10
+                    ' rivertrees(x0t, y0t, p_treewth, p_treeht)
+                    ' newtreetrunks(x0 + wid0 / 1.7, y0 + hgt0, botwidth, hgt0)
+                    ' newtreetrunks(x0t + p_treewth / 1.7, y0t + p_treeht, botwidth, p_treeht)
                 Next
-                roadfill()
-                pole()
 
-
+                g.DrawRectangle(Pens.Red, box1)
             End If
-        End If
-        Exit Sub
+            y0 += incY
+        Next
+        ' y = (v * height * 800) / distance
+
     End Sub
 
-    Private Sub Trials()
+    Private Sub colorsummary()
+        'Declare colour palette used by the painting
+        'Declare colour palette used by the painting
+        Dim colorsummary As String = ""
+        colorsummary = FormSettings.colorscheme & " "
+        If Mid(colorsummary, 1, 3) <> "CMB" Then
+            For i = 0 To 6
+                colorsummary = colorsummary & colorname(FormSettings.colours(i))
+                If FormSettings.colours(i + 1) = 0 Then GoTo colorsum
+                If i < 6 Then
+                    If FormSettings.colours(i + 1) > 0 Then
+                        colorsummary = colorsummary & ", "
+                    End If
+                End If
+            Next
+        End If
+colorsum:
+        Dim aFont As New System.Drawing.Font(" Arial", 8, FontStyle.Italic)
+        g.DrawString(colorsummary, aFont, Brushes.Black, 8, 8)
+        ' g.DrawString(CStr(yrand(3)), aFont, Brushes.Black, 8, 18)
+    End Sub
+    Private Sub makehomescene() ' presently a project
+        ellipseondark()
+        'makeskyfluffcover(300, 100, 100, 80)
+        Lombardy()
+        'deciduous()
+        ''setupbuildingcolors()
+        ''rowhousetype = "single"
+        ''placebuilding("single")
+
+        'xmastree(30, 400, 70)
+
+    End Sub
+    Private Sub homes()
+        If yrand(10) > 5 Then 'single building
+            setupbuildingcolors()
+            rowhousetype = "single"
+            placebuilding("single")
+
+        Else ' inlne rowhousing
+            Dim van, r, ht As Integer
+            r = randsign()
+            van = randh(5, 50) * r
+
+            For multib = 0 To 7
+                ht = randh(0, 2)
+                If ht = 0 Then
+                    rht = "withdoorstep"
+                ElseIf ht = 1 Then
+                    rht = "withlowdeck"
+                ElseIf ht = 2 Then
+                    rht = "withoutdeckorstep"
+                End If
+                rowhousetype = rht
+
+                RVP = RVP + van
+                setupbuildingcolors()
+                placebuilding("inline")
+            Next
+            roadfill()
+            pole()
+
+        End If
+    End Sub
+    Private Sub farm()
+
+    End Sub
+    Private Sub xmastreeforest()
+
+        Dim x0 As Integer
+        Dim y0, b As Single
+        horizon = randh(100, 250)
+        makeskycolor()
+        makedistantmountains()
+        Dim n As Integer
+        y0 = horizon
+        Dim rect As New Rectangle(x0, y0, Image.Width, 100)
+        Dim dense As New SolidBrush(Color.Empty)
+        dense.Color = ModCMBcolors.getCMBcolor(3, 2, 7)
+        Mred = dense.Color.R : Mgreen = dense.Color.G : Mblue = dense.Color.B
+        makeland(1) '0 means lighter colors
+
+        b = 600 'distance
+        y0 = y0 + 10
+
+        Do While b > 20
+            For n = 1 To b / 10
+                x0 = yrand(Image.Width)
+                xmastree(x0, y0, b)
+            Next
+            b -= 20
+            y0 = y0 + 0.005 * y0
+            If Settings.Winter = True Then If b > 20 Then makemist(3)
+            If Settings.Mist = True Then If b > 20 Then makemist(1)
+        Loop
+        'bush(yrand(Image.Width), 350, 15)
+        If Settings.Winter = True Then  'for snow falling
+            Dim sfw, ellip, sfh As Integer
+            Dim rec As New Rectangle
+            For ellip = 1 To 300
+                y0 = yrand(Image.Height)
+                sfw = randh(2, 4) : sfh = randh(2, 4)
+                rec = New Rectangle(yrand(Image.Width), y0, sfw, sfh)
+                g.FillEllipse(Brushes.White, rec)
+            Next
+
+            horizon = randh(100, 250)
+            makeskycolor()
+            makedistantmountains()
+            y0 = horizon
+            rect = New Rectangle(x0, y0, Image.Width, 100)
+            dense = New SolidBrush(Color.Empty)
+            dense.Color = ModCMBcolors.getCMBcolor(3, 2, 7)
+            Mred = dense.Color.R : Mgreen = dense.Color.G : Mblue = dense.Color.B
+            makeland(1) '0 means lighter colors
+
+            b = 600 'distance
+            y0 = y0 + 10
+
+            Do While b > 20
+                For n = 1 To b / 10
+                    x0 = yrand(Image.Width)
+                    xmastree(x0, y0, b)
+                Next
+                b -= 20
+                y0 = y0 + 0.005 * y0
+                If Settings.Winter = True Then If b > 20 Then makemist(3)
+                If Settings.Mist = True Then If b > 20 Then makemist(1)
+            Loop
+        End If
+    End Sub
+    Private Sub black()
+        Dim area As New Rectangle(0, 0, Image.Width, Image.Height)
+        Dim brush As New SolidBrush(Color.Black)
+        g.FillRectangle(brush, area)
+
+    End Sub
+    Private Sub tulipbuds()
+        Dim n, red, green, blue, colsymb As Integer
+        Dim recpath As New Drawing2D.GraphicsPath
+        Dim ellpath As New Drawing2D.GraphicsPath
+        Dim brushfl As New SolidBrush(Color.Empty)
+        recpath.AddBezier(New Point(100, 70), New Point(240, 60), New Point(75, 225), New Point(93, 70))
+        black()
+        If FormSettings.scheme > 9 Then
+            findcolor(3)
+            red = Mred : green = Mgreen : red = Mred
+        Else
+            colsymb = randh(0, FormSettings.scheme)
+            M_color = FormSettings.colours(colsymb)
+            brushfl.Color = modColors.getcolor(M_color, 1, 5)
+            red = brushfl.Color.R : green = brushfl.Color.G : blue = brushfl.Color.B
+        End If
+        For n = 1 To 12
+            '  ellpath = recpath.Clone
+            g.TranslateTransform(randh(-1, 80), randh(-10, 10))
+            brushfl.Color = Color.FromArgb(red, green, blue)
+            g.FillPath(brushfl, recpath)
+            ' inflate(15, 15)
+            green += randh(-30, 30)
+            If green > 255 Then green = 255
+            If green < 0 Then green = 0
+            red += randh(-30, 30)
+            If red > 255 Then red = 255
+            If red < 0 Then red = 0
+            blue += randh(-30, 30)
+            If blue > 255 Then blue = 255
+            If blue < 0 Then blue = 0
+        Next
+
+
+    End Sub
+
+    Private Sub Flower()
+
+        Dim x0, y0, width, height, rotatex, rotatey, colsymb, m_color, a, red, green, blue As Integer
+        x0 = Image.Width / 3
+        y0 = Image.Height * 0.3
+        width = 130
+        height = width * 0.4
+        Dim brush As New SolidBrush(Color.Fuchsia)
+        If FormSettings.scheme > 9 Then
+            findcolor(3)
+            red = Mred : green = Mgreen : red = Mred
+        Else
+            colsymb = randh(0, FormSettings.scheme)
+            m_color = FormSettings.colours(colsymb)
+            brush.Color = modColors.getcolor(m_color, 1, 5)
+            red = brush.Color.R : green = brush.Color.G : blue = brush.Color.B
+        End If
+        Dim flpath As New Drawing2D.GraphicsPath
+
+        Dim rect As New Rectangle
+        rect = New Rectangle(x0, y0, width, height)
+        Dim endpt As Integer = 40
+        Dim adegrees As Integer = 39
+        For a = 1 To endpt
+            rotatex = x0 + width * 1.2
+            rotatey = y0 + (height / 1.8)
+            'flpath.AddEllipse(x0, y0, width, height)
+            ' g.SetClip(flpath)
+            brush.Color = Color.FromArgb(red, green, blue)
+            g.FillEllipse(brush, rect)
+            'Dim blendbrushv As New Drawing2D.LinearGradientBrush(area, _
+            '          Color.FromArgb(n, uppercolor.r, uppercolor.g, uppercolor.b), _
+            '          Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+            '                  Drawing2D.LinearGradientMode.Vertical)
+            'g.FillRectangle(blendbrushv, area)
+            g.ResetClip()
+            Rotate(rotatex, rotatey, adegrees)
+            If a = 10 Or a = 20 Or a = 30 Then
+                ' endpt = endpt + yrand(3)
+                x0 += 30
+                width -= 50
+                height = width * 0.35
+                adegrees += yrand(5)
+                red += randh(-30, 30)
+                If red > 255 Then red = 255
+                If red < 0 Then red = 0
+                green += randh(-30, 30)
+                If green > 255 Then green = 255
+                If green < 0 Then green = 0
+                blue += randh(-30, 30)
+                If blue > 255 Then blue = 255
+                If blue < 0 Then blue = 0
+            End If
+        Next
+
+
+
+
+
+        'Lombardy()
+        'lonepine()
+        'g.FillRectangle(Brushes.Chocolate, 200, 250, 5, 5)
+        'pinebough(200, 250, 5, 30)
         ' g.DrawLine(Pens.Blue, 0, horizon, Image.Width, horizon)
-        'makemidpines() 'pie shapes, good start
-        'trialtrees() 'bunched ellipses
-        'bezierbranches() 'wierd,wonderful
-        'deciduous() 'good start
+        ' makemidpines() 'pie shapes, good start
+
+        ' bezierbranches() 'wierd,wonderful
+        'For i = 1 To 10
+        '    deciduous() 'good start
+        'Next
+        ' gnarledtree(300, 400, 150)
         'rivertrees(300, 200, 100, 300)
         ' makeskyevening()
         'trial_distanceformula()
         'gas()
         '  If Settings.Fog = True Then makemist()
-        'makemidpines()
         ' makeskyfluffclouds()
-        ' makemidpines()
+
         'treeheight()
+        'treestand()
+        '   aspengrove()
         'makebezierspears()
         'makewaterfall()
         'trial()
@@ -218,7 +770,7 @@ Buildings:
 
     End Sub
     Private Sub setupbuildingcolors()
-        If Settings.Scheme > 9 Then
+        If FormSettings.scheme > 9 Then
             setuphousecolorsCMB("walls")
             setuphousecolorsCMB("roof")
             setuphousecolorsCMB("chimney")
@@ -254,7 +806,7 @@ Buildings:
             End If
             gap = randh(20, 27)
             ef = horizon + 1 : fg = horizon + 40
-            If Settings.Mountains = True Then ef = lastmountainy : fg = ef + 40
+            If Settings.Mountainous = True Then ef = lastmountainy : fg = ef + 40
             Ay = randh(ef, fg)
             LVPM = LVP + (Ax - LVP) * 0.45  'left measuring point
             RVPM = Ax + (RVP - Ax) * 0.45   'right measuring point
@@ -265,7 +817,7 @@ Buildings:
         If subject = "inline" Then
             Ax = newAx
             If Ax < -150 Then
-              
+
                 Exit Sub
             End If
 
@@ -368,10 +920,10 @@ Buildings:
             point28, point29, point30, point31}
             mtnpath = New Drawing2D.GraphicsPath
             mtnpath.AddClosedCurve(curvepoints, 0.3F)
-            Dim subject As String = "bg_mountains" : Dim type As String = "rect"
+            Dim subject As String = "bg_mountains"
             g.SetClip(mtnpath)
             colorblend(mtnpath.GetBounds.X, mtnpath.GetBounds.Y, mtnpath.GetBounds.Width, _
-                        mtnpath.GetBounds.Height, subject, type)
+                        mtnpath.GetBounds.Height, subject, 0)
             g.ResetClip()
             If Settings.Outlines = True Then g.DrawPath(stainedglasspen, mtnpath)
             '  If mtptsx(17) > Image.Width Then Exit Do
@@ -380,9 +932,9 @@ Buildings:
         Next
 
     End Sub
-    Private Sub makeland()
+    Private Sub makeland(ByVal type)
 
-        colorblend(0, horizon - 2, Image.Width, Image.Height, "land", "rect")
+        colorblend(0, horizon - 2, Image.Width, Image.Height, "land", type)
         horizonmist()
 
     End Sub
@@ -605,7 +1157,7 @@ Buildings:
         Dim pen As New Pen(Color.LightBlue, 50)
         ' g.DrawLine(pen, 0, horizon, Width, horizon)
 
-        For j = 1 To 9 'do 7 lines across the picture
+        For j = 1 To 2 'do 7 lines across the picture
             addit += 10 'increase size of fluctuation
             For i = 0 To 7 'get 8 points along the width to draw a line
                 x(i) = xbit * i + yrand(addit) + start
@@ -621,10 +1173,10 @@ Buildings:
             Dim point8 As New Point(x(8), y(8)) : Dim point9 As New Point(x(9), y(9))
             Dim curvePoints As Point() = {point0, point1, point2, point3, point4, _
                    point5, point6, point7, point8, point9}
-            Settings.Colours(0) = Settings.DominantColor
-            If Settings.Scheme > 9 Then
+            ' Settings.Colours(0) = Settings.DominantColor
+            If FormSettings.scheme > 9 Then
                 Dim light, colors As Integer
-                Dim cmbseason As Integer = Settings.Scheme - 10
+                Dim cmbseason As Integer = FormSettings.scheme - 10
                 light = c_randh(0, 2)
                 Dim brush As New SolidBrush(Color.Orange)
                 colors = c_randh(1, 14)
@@ -634,12 +1186,12 @@ Buildings:
                 Dim colsymb, domin As Integer
                 Dim tension As Single = 1
                 Dim brush As New SolidBrush(Color.Orange)
-                Dim scheme As Integer = Settings.Scheme
+                Dim scheme As Integer = FormSettings.scheme
                 Dim colorchoice, colorlevel, grayness As Integer
-                If Settings.Scheme > 4 Then domin = 1 Else domin = 2
+                If FormSettings.scheme > 4 Then domin = 1 Else domin = 2
                 colsymb = c_randh(0, scheme * domin)
-                If colsymb > Settings.Scheme Then colsymb = 0 'setting dominance through weighting
-                colorchoice = Settings.Colours(colsymb)
+                If colsymb > FormSettings.scheme Then colsymb = 0 'setting dominance through weighting
+                colorchoice = FormSettings.colours(colsymb)
                 grayness = 3
                 colorlevel = 9 - j
                 brush.Color = modColors.getcolor(colorchoice, grayness, colorlevel)
@@ -662,11 +1214,11 @@ Buildings:
 
     Private Sub makeskycolor()
 
-        Dim sky As New Rectangle(0, 0, Image.Width, horizon + 50)
+        Dim sky As New Rectangle(0, 0, Image.Width, horizon + 5)
 
 CMB:
-        If Settings.Scheme > 9 Then
-            Dim cmbseason As Integer = Settings.Scheme - 10
+        If FormSettings.scheme > 9 Then
+            Dim cmbseason As Integer = FormSettings.scheme - 10
             Dim light1 As Integer = c_randh(0, 2)
             Dim colors1 As Integer = c_randh(0, 13)
 
@@ -689,16 +1241,17 @@ nonCMB:
 
             Dim colsymb, colsymb2, domin As Integer
             Dim brush As New SolidBrush(Color.Orange)
-            Dim scheme As Integer = Settings.Scheme
+            Dim scheme As Integer = FormSettings.scheme
             Dim colorchoice, colorchoice2, colorlevel, grayness As Integer
-            If Settings.Scheme > 4 Then domin = 1 Else domin = 2
+            If FormSettings.scheme > 4 Then domin = 1 Else domin = 2
             colsymb = c_randh(0, scheme * domin)
             colsymb2 = c_randh(0, scheme)
-            If colsymb > Settings.Scheme Then colsymb = 0 'setting dominance through weighting
-            colorchoice = Settings.Colours(colsymb)
-            colorchoice2 = Settings.Colours(colsymb2)
+            If colsymb > FormSettings.scheme Then colsymb = 0 'setting dominance through weighting
+            colorchoice = FormSettings.colours(colsymb)
+            skycolor = colorchoice
+            colorchoice2 = FormSettings.colours(colsymb2)
             grayness = 2
-            colorlevel = 6
+            colorlevel = 7
 
             Dim Brush2 As New Drawing2D.LinearGradientBrush(sky, _
             modColors.getcolor(colorchoice, grayness, colorlevel), _
@@ -726,8 +1279,8 @@ nonCMB:
     End Sub
     Private Sub makeocean()
         'paint sea
-        Dim subject As String = "sea" : Dim type As String = "rect"
-        colorblend(0, horizon - 2, Image.Width, Image.Height - horizon - 2, subject, type)
+        Dim subject As String = "sea"
+        colorblend(0, horizon - 2, Image.Width, Image.Height - horizon - 2, subject, 0)
         If Settings.Outlines = True Then g.DrawLine(stainedglasspen, 0, horizon, Image.Width, horizon)
         horizonmist()
 
@@ -815,7 +1368,7 @@ nonCMB:
                         Dim rect As New Rectangle(x1, y1, xwidth, -yheight)
 
                         Dim c As Integer = 30
-                        If Settings.Above = True Or Settings.Ambient = True Or Settings.Evening = True Then
+                        If Settings.Above = True Or Settings.Evening = True Then
                             Dim Brush0 As New Drawing2D.LinearGradientBrush(rect, _
                             Color.FromArgb(c, Mred, Mgreen, Mblue), _
                             Color.FromArgb(255, 255, 255, 250), _
@@ -845,60 +1398,62 @@ nonCMB:
     End Sub
     Private Sub rivertrees(ByVal x, ByVal y, ByVal width, ByVal height)
 
-        height = height * randh(40, 100) / 100
-        Dim rect As New Rectangle(x, y, width, height)
+         Dim rect As New Rectangle(x, y, width, height)
 
         'SET UP PATH TO INCLUDE SEVERAL ARCS AROUND THE EDGE OF THE RECTANGLE
         Dim n, arcbegin, arclength As Integer
-        Dim xt, yt, w, startx, starty, rectwid, recthgt, strx, stry As Single
+        Dim xt, yt, w, startx, starty, rectwid, recthgt As Single
         Dim arcs_path As New Drawing2D.GraphicsPath
+        Dim rectl(10), rects(10), pointx(10), pointy(10)
         w = width / 3
 
-        'MAKE eight ARCS WITHIN THE AREA OF THE RECTANGLE
-        Dim r As Integer = yrand(8)
-        For n = 2 To 9 Step 1
-            xt = yrand(width / 20)
-            yt = yrand(height / 20)
-            rectwid = width / randh(2, 3)
+        'MAKE nine ARCS WITHIN THE AREA OF THE RECTANGLE
+
+        Dim coord(10) As String
+        xt = width / 20
+        yt = height / 20
+        arcbegin = 90
+        arclength = randh(90, 150)
+
+        For n = 1 To 8
+            rectwid = xt * randh(5, 15)
+            recthgt = yt * randh(5, 15)
             If rectwid < 1 Then Return
-            recthgt = height / randh(2, 3)
-            arcbegin = 90
-            arclength = randh(120, 140)
 
-            If n = 1 Or n = 7 Or n = 8 Then startx = x + randsign() * yrand(xt) : arcbegin = randh(180, 190)
-            If n = 3 Or n = 4 Or n = 5 Then startx = x + 2 * w + yrand(xt) : arcbegin = 270
-            If n = 2 Or n = 6 Then startx = x + width * 0.3 + randsign() * xt
-            If n = 1 Or n = 2 Or n = 3 Then starty = y - (xt) * 2
-            If n = 5 Or n = 6 Or n = 7 Then starty = y + height * 0.55
-            If n = 4 Or n = 8 Then starty = y + height * 0.2 + yrand(yt)
-            If n = 1 Then strx = startx : stry = starty
-            If n = 2 Then strx = startx : stry = starty : arcbegin = yrand(360)
-            If n = 9 Then startx = strx : starty = stry
-            If n = 10 Then startx = strx : starty = stry
-            If n = 6 Then arcbegin = 0
-
-            If n <> r Then arcs_path.AddArc(startx, starty, rectwid, recthgt, arcbegin, arclength)
-            If randsign() > 0 Then
+            If n = 1 Then
+                startx = x + (xt * randh(-2, 2)) : starty = y + yt * randh(-2, 2) : arcbegin = randh(90, 190)
+            ElseIf n = 2 Then
+                startx = x + (xt * 9) + (xt * randh(-2, 2)) : starty = y + (yt * randh(-4, 0)) : arcbegin = randh(150, 270)
+            ElseIf n = 3 Then
+                startx = x + xt * 19 + (xt * randh(-2, 2)) - (rectwid * 0.5) : starty = y + yt * randh(-2, 2) : arcbegin = randh(240, 300)
+            ElseIf n = 4 Then
+                startx = x + xt * 18 + (xt * randh(-2, 2)) - (rectwid * 0.5) : starty = y + yt * 6 + yt * (randh(-2, 2)) : arcbegin = randh(240, 300)
+            ElseIf n = 5 Then
+                startx = x + xt * 18 + (xt * randh(-2, 2)) - (rectwid * 0.5) : starty = y + yt * 14 + yt * (randh(-2, 0)) - 0.5 * recthgt : arcbegin = randh(240, 300)
+            ElseIf n = 6 Then
+                startx = x + xt * 9 + xt : starty = y + yt * 10 : arcbegin = 0
+                recthgt = height / 3 : rectwid = width / 4
+            ElseIf n = 7 Then
+                startx = x + (xt * randh(-2, 2)) : starty = y + yt * 14 + yt * (randh(-2, 0)) - recthgt * 0.5 : arcbegin = randh(90, 190)
+            ElseIf n = 8 Then
+                startx = x + (xt * randh(-2, 2)) : starty = y + yt * 6 + yt * randh(-2, 2) : arcbegin = randh(90, 190)
+            ElseIf n = 9 Then
+                startx = x + (xt * 2) : starty = y + (yt * 6) : arcbegin = randh(240, 300)
+            ElseIf n = 10 Then
+                startx = x + (xt * 18) : starty = y + (yt * 5) : arcbegin = yrand(360) 'randh(240, 300)
             End If
+
+            arcs_path.AddArc(startx, starty, rectwid, recthgt, arcbegin, arclength)
         Next n
-        g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+       
         g.SetClip(arcs_path)
-
-        Dim subject As String = "river trees" : Dim type As String = "rect"
-
         colorblend(arcs_path.GetBounds.X, arcs_path.GetBounds.Y, arcs_path.GetBounds.Width, _
-               arcs_path.GetBounds.Height, subject, type)
-        'Rotate(arcs_path.GetBounds.X + arcs_path.GetBounds.Width / 2, _
-        '       arcs_path.GetBounds.Y + arcs_path.GetBounds.Height / 2, 180)
-
-        Dim stainpen As New Pen(Color.Black, 3)
-        If Settings.Outlines = True Then g.DrawPath(stainpen, arcs_path)
-        g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
-        'RotateBack(arcs_path.GetBounds.X + arcs_path.GetBounds.Width / 2, _
-        '       arcs_path.GetBounds.Y + arcs_path.GetBounds.Height / 2, 180)
-
+               arcs_path.GetBounds.Height, "river trees", 0)
         g.ResetClip()
 
+        Dim stainpen As New Pen(Color.Black, 1)
+        If Settings.Outlines = True Then g.DrawPath(stainpen, arcs_path)
+       
     End Sub
     Private Sub landshape(ByVal typ, ByVal begy, ByVal numdiv, ByVal yvar, ByVal grade, ByVal curv, ByVal distance)
         'ref from rollinghill
@@ -941,9 +1496,9 @@ nonCMB:
         landpath = New Drawing2D.GraphicsPath
         landpath.AddCurve(land)
         g.SetClip(landpath)
-        Dim subject As String = "landshape" : Dim type As String = "rect"
+        Dim subject As String = "landshape"
         colorblend(landpath.GetBounds.X, landpath.GetBounds.Y, landpath.GetBounds.Width, _
-                landpath.GetBounds.Height, subject, type)
+                landpath.GetBounds.Height, subject, 0)
         g.ResetClip()
         If Settings.Outlines = True Then g.DrawPath(stainedglasspen, landpath)
 
@@ -999,10 +1554,10 @@ nonCMB:
                    point5, point6, point7}
             Dim striate_path As New Drawing2D.GraphicsPath
             striate_path.AddCurve(curvePoints)
-            Dim subject As String = "striate" : Dim type As String = "rect"
+            Dim subject As String = "striate"
             g.SetClip(striate_path)
             colorblend(striate_path.GetBounds.X, striate_path.GetBounds.Y, striate_path.GetBounds.Width, _
-                        striate_path.GetBounds.Height, subject, type)
+                        striate_path.GetBounds.Height, subject, 0)
             g.ResetClip()
 
         Next
@@ -1027,24 +1582,26 @@ nonCMB:
     Private Sub gas()
         'gas cost, US and Canada exchange
         Dim usd, can, can_purchase_rate_usd, usd_gas_rate, usd_purchase_rate_can, can_gas_rate As Double
-        Dim can_rate, usd_rate As String
-        Dim n As Integer = 0
+        Dim can_rate, usd_rate, output As String
+        Dim font As New Font("arial", 16)
+        Dim n As Integer = 1 ' type 0 if using US to Can, 1 if Canadian to US
         If n = 0 Then            'pay usd per gal.  How much is that in can/liter?
             '1 gal = 3.7 liters
-            usd = 2.32 'cost per gallon of gas...changing
-            can_purchase_rate_usd = 1.2 ' 1.18 straight across, or 1.20 if bought
+            usd = 2.91 'cost per gallon of gas...changing
+            can_purchase_rate_usd = 1.11 ' 1.18 straight across, or 1.20 if bought
             can = usd * can_purchase_rate_usd ' purchase per $1.00 USD
             can_gas_rate = can / 3.7 'liters
             can_rate = Mid(CStr(can_gas_rate), 1, 5)
-            MessageBox.Show(CStr(usd) & " US per gallon =  " & can_rate & " Cdn per liter")
+            output = (CStr(usd) & " US per gallon =  " & can_rate & " Cdn per liter")
         Else
-            can = 76.9 'cost per liter of gas ... changing
-            usd_purchase_rate_can = 0.845
+            can = 1.019 'cost per liter of gas ... changing
+            usd_purchase_rate_can = 0.9
             usd = can * usd_purchase_rate_can 'usd cost of one liter
-            usd_gas_rate = usd * 3.7 'usd cost of one gallon
+            usd_gas_rate = usd * 3.7  'usd cost of one gallon
             usd_rate = Mid(CStr(usd_gas_rate), 1, 5)
-            MessageBox.Show(CStr(can) & " Cdn per liter =  " & usd_rate & " USD per gallon")
+            output = (CStr(can) & " Cdn per liter =  " & usd_rate & " USD per gallon")
         End If
+        g.DrawString(output, font, Brushes.Black, New RectangleF(Image.Width / 3, Image.Height / 2, 800, 20))
 
     End Sub
     Private Sub makefillspace()
@@ -1081,9 +1638,9 @@ nonCMB:
             distant_path.AddCurve(curvePoints)
             accdistant_path.AddCurve(curvePoints)
             g.SetClip(distant_path)
-            Dim subject As String = "fillspace" : Dim type As String = "rect"
+            Dim subject As String = "fillspace"
             colorblend(distant_path.GetBounds.X, distant_path.GetBounds.Y, distant_path.GetBounds.Width, _
-                       distant_path.GetBounds.Height, subject, type)
+                       distant_path.GetBounds.Height, subject, 0)
 
             Dim a As Integer
             If Settings.Winter = True Then a = 240 Else a = 100
@@ -1178,10 +1735,10 @@ nonCMB:
             point28, point29, point30, point31}
             mtnpath = New Drawing2D.GraphicsPath
             mtnpath.AddClosedCurve(curvepoints, 0.3F)
-            Dim subject As String = "bg_mountains" : Dim type As String = "rect"
+            Dim subject As String = "bg_mountains"
             g.SetClip(mtnpath)
             colorblend(mtnpath.GetBounds.X, mtnpath.GetBounds.Y, mtnpath.GetBounds.Width, _
-                        mtnpath.GetBounds.Height, subject, type)
+                        mtnpath.GetBounds.Height, subject, 0)
             g.ResetClip()
             If Settings.Outlines = True Then g.DrawPath(stainedglasspen, mtnpath)
             If mtptsx(17) > Image.Width Then
@@ -1205,7 +1762,7 @@ nonCMB:
         x1 = Image.Width
         y1 = y + yrand(100)
 
-        dualcolorblend(x, y, x1, y1, 9, 1)
+        dualcolorblend(x, y, x1, y1, "lake", 1)
         'Dim lake As New Rectangle(x, y, x1, y1)
         'Dim lBrush As New Drawing2D.LinearGradientBrush(lake, Color.FromArgb(255, _
         'yrand(255), yrand(255), yrand(255)), _
@@ -1230,8 +1787,7 @@ nonCMB:
 
     End Sub
 
-
-    Private Sub makebezierspears()
+    Private Sub spears()
         '-------------------------------------------------------BEZIER CURVES
         Dim x0, x1, x2, x3, y0, y1, y2, y3 As Integer
         Dim spear As Drawing2D.GraphicsPath
@@ -1247,7 +1803,7 @@ nonCMB:
                 y1 = Image.Height
 
                 x2 = x0 + randsign() * yrand(80)
-                y2 = randh(300, 400)
+                y2 = randh(y1, y1 - 100)
                 x3 = x1 + (x2 - x0) + yrand(5)
                 y3 = y2
 
@@ -1255,154 +1811,1014 @@ nonCMB:
                 New Point(x2, y2), New Point(x3, y3))
 
                 g.FillPath(brushy, spear)
+                If Settings.Outlines = True Then g.DrawPath(stainedglasspen, spear)
             Next
         Next
     End Sub
 
-    Private Sub maketrunkpaths()
+    Private Sub birchstand()
 
-        Dim brushy As New SolidBrush(Color.Firebrick)
-
-        Dim x(3), y(3) As Integer
-        Dim trunk As Drawing2D.GraphicsPath
-
-        For n As Integer = 1 To 3
-            trunk = New Drawing2D.GraphicsPath
-            x(0) = yrand(Image.Width)
-            y(0) = 0
-
-            x(1) = x(0) + randh(10, 20)
-            y(1) = 0
-
-            x(2) = x(0) + randsign() * yrand(100)
+        Dim x(8), y(8), nb, n As Integer
+        nb = randh(3, 5)
+        For n = 1 To nb
+            'trunk = New Drawing2D.GraphicsPath
+            x(0) = yrand(Image.Width) 'beginning point - upper left
+            y(0) = -2
+            x(1) = x(0) + randh(25, 36) 'other side of top
+            y(1) = -2
+            x(2) = x(0) + randsign() * yrand(30) 'bottom left
             y(2) = Image.Height
-
-            x(3) = x(2) + (x(1) - x(0)) + yrand(5)
+            x(3) = x(2) + (x(1) - x(0)) + yrand(5) 'bottom right
             y(3) = Image.Height
 
             Dim point0 As New Point(x(0), y(0))
             Dim point1 As New Point(x(1), y(1))
             Dim point2 As New Point(x(2), y(2))
             Dim point3 As New Point(x(3), y(3))
+            Dim point4 As New Point(x(0), y(0))
 
-            Dim curvePoints As Point() = {point0, point1, point2, point3}
-            Dim tension As Single = 3.0
-            'g.FillClosedCurve(mistybrush, curvePoints)
+            Dim trunk As Point() = {point0, point1, point3, point2, point0}
+            'Dim tension As Single = 3.0
 
-            trunk.AddLine(point0, point1)          'FOR A TREE
-            trunk.AddLine(point3, point2)
-            g.FillPath(brushy, trunk)
+            Dim trunkpath As New Drawing2D.GraphicsPath
+            trunkpath.AddCurve(trunk)
 
+            g.SetClip(trunkpath)
 
-            '-----------------------------------------SETTING A CLIP (FOR ABOVE REGION)
-            'g.SetClip(trunk)
-            'g.SetClip(trunk, Drawing2D.CombineMode.Exclude)
-            'Dim rpen As New Pen(Color.Black, 4)
-            'Dim tryout As New Rectangle(10, 113, 400, 100)
-            'g.DrawRectangle(rpen, tryout)
-            'g.ResetClip()
+            'setting path dimensions
+            Dim beginx, beginy, xwidth, yheight As Integer
+            beginx = trunkpath.GetBounds.X
+            beginy = trunkpath.GetBounds.Y
+            xwidth = trunkpath.GetBounds.Width
+            yheight = trunkpath.GetBounds.Height
+            Dim area As New Rectangle(beginx, beginy, xwidth, yheight)
+            mem_y = beginy ' get memory of this location
+            mem_x = beginx
+            If FormSettings.scheme < 10 Then
+                GoTo regcolorscheme
+            End If
+
+cmbcolorscheme:
+            cmbseason = FormSettings.scheme - 10 'CMB color seasons from 0 to 3
+            Dim color1, tone As Integer
+            If cmbseason = 0 Then color1 = 4
+            If cmbseason = 1 Then color1 = 2
+            If cmbseason = 2 Then color1 = 2
+            If cmbseason = 3 Then color1 = 3
+            tone = 0
+
+            Dim CMBbrush As New SolidBrush(Color.Empty)
+            CMBbrush.Color = ModCMBcolors.getCMBcolor(cmbseason, tone, color1)
+            g.FillRectangle(CMBbrush, area)
+            GoTo shadeit
+
+regcolorscheme:
+
+            Dim colorno, dom As Integer
+            dom = FormSettings.scheme
+            colorno = c_randh(0, dom)
+            M_color = FormSettings.colours(colorno)
+            Dim regbrush As New SolidBrush(Color.Orange)
+            regbrush.Color = modColors.getcolor(M_color, 1, 9)
+            g.FillRectangle(regbrush, area)
+
+shadeit:
+            If Settings.Right = True Then
+                Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                             Color.FromArgb(150, 0, 0, 0), _
+                             Color.FromArgb(0, 230, 230, 230), _
+                             Drawing2D.LinearGradientMode.Horizontal)
+                g.FillRectangle(Brush3, area)
+            Else
+                Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                                             Color.FromArgb(0, 230, 230, 230), _
+                                             Color.FromArgb(150, 0, 0, 0), _
+                                             Drawing2D.LinearGradientMode.Horizontal)
+                g.FillRectangle(Brush3, area)
+            End If
+            'If Settings.Outlines = True Then g.DrawPath(outlinepen, trunkpath)
+
+trunkscars:
+            Dim x0, x1, x2, x3, y0, y1, y2, y3, sc As Integer
+            For sc = 1 To 10
+                x0 = randh(beginx - 20, xwidth + beginx)
+                y0 = yrand(Image.Height)
+                x2 = x0 + (x(1) - x(0))
+                y2 = y0 + yrand(5)
+                x1 = x0 + (x2 - x0) * randh(2, 4) / 10
+                y1 = y0 - (x2 - x0) * 0.5
+                x3 = x1
+                y3 = y1 + yrand(3)
+
+                Dim scarpath = New Drawing2D.GraphicsPath
+                scarpath.addbezier(New Point(x0, y0), New Point(x1, y1), _
+                   New Point(x2, y2), New Point(x3, y3))
+                'scarpath.addbezier(New Point(x2, y2), New Point(x3, y3), _
+                '             New Point(x0, y0), New Point(x1, y1))
+                Dim scarbrush As New SolidBrush(Color.FromArgb(100, 0, 0, 0))
+                g.FillPath(scarbrush, scarpath)
+            Next
+            g.ResetClip()
+            If Settings.Outlines = True Then g.DrawPath(outlinepen, trunkpath)
         Next
-        Return
-        '-----------------------------------------SETTING and testing A CLIP (FOR ABOVE REGION)
-        'g.SetClip(trunk2)
-        'g.SetClip(trunk)
-        'Dim rpen As New Pen(Color.Black, 4)
-        'Dim tryout As New Rectangle(10, 113, 400, 100)
-        'g.DrawRectangle(rpen, tryout)
-        'g.drawing2d.ExcludeClip(trunk2) '---------doesn't work
+        If yrand(8) > 0 Then
+            spears()
+            Dim bl As Integer = yrand(500)
+            bushleaves(bl, Image.Height - 30, 20)
+        End If
+
+        If yrand(8) > 0 Then
+            bushleaves(mem_x, mem_y + 60, 30)
+        End If
+
+    End Sub
+    Private Sub colortestlarge()
+        Dim red, green, blue, x, y, j, k As Integer
+        Dim cname As String
+        Dim color1
+
+        i = FormSettings.dominantcolor
+        cname = modColors.colorname(i)
+        Dim Font As New System.Drawing.Font(" Arial", 8, FontStyle.Bold)
+        x = 8
+        y = 80
+        For j = 1 To 3
+            For k = 1 To 9
+                color1 = modColors.getcolor(i, j, k)
+                red = color1.r
+                green = color1.g
+                blue = color1.b
+                Dim brush0 As New SolidBrush(System.Drawing.Color.FromArgb(255, color1))
+                g.FillRectangle(brush0, x, y, 80, 80)
+                x += 80
+            Next
+            y += 81
+            x = 8
+        Next
+    End Sub
+
+    Private Sub colorcode()
+        Dim i, j, k, x, y, x0, avey, red, green, blue As Integer
+        Dim red1, green1, blue1, cname, ave_y As String
+        Dim color1
+        x0 = 0
+        i = FormSettings.dominantcolor
+        cname = modColors.colorname(i)
+        Dim aFont As New System.Drawing.Font(" Arial", 7, FontStyle.Bold)
+        Dim bFont As New System.Drawing.Font(" Arial", 8, FontStyle.Bold)
+        For j = 1 To 3
+            For k = 1 To 9
+                color1 = modColors.getcolor(i, j, k)
+                red = color1.r
+                green = color1.g
+                blue = color1.b
+                avey = (red + green + blue) / 3
+                ave_y = CStr(avey)
+                red1 = CStr(red)
+                green1 = CStr(green)
+                blue1 = CStr(blue)
+                Dim pen As New Pen(Drawing.Color.Blue, 1)
+
+                x = x0 + 30 * k
+
+
+                Dim brush0 As New SolidBrush(System.Drawing.Color.FromArgb(255, red, green, blue))
+                g.FillRectangle(brush0, x, 300, 22, 22)
+
+                g.DrawString(red1, aFont, Brushes.Black, x, 320)
+                g.DrawString(green1, aFont, Brushes.Black, x, 328)
+                g.DrawString(blue1, aFont, Brushes.Black, x, 336)
+                g.DrawString(ave_y, bFont, Brushes.Chocolate, x, 350)
+
+                y = 280 - red
+                Dim brush As New SolidBrush(System.Drawing.Color.FromArgb(255, 255, 0, 0))
+                g.FillEllipse(brush, x, y, 13, 13)
+
+                y = 280 - green
+                Dim brush1 As New SolidBrush(System.Drawing.Color.FromArgb(255, 0, 255, 0))
+                g.FillEllipse(brush1, x, y, 11, 11)
+
+                y = 280 - blue
+                Dim brush2 As New SolidBrush(System.Drawing.Color.FromArgb(255, 0, 0, 255))
+                g.FillEllipse(brush2, x, y, 9, 9)
+
+            Next
+            x0 += 300
+        Next
+        aFont = New System.Drawing.Font(" Arial", 12, FontStyle.Bold)
+        g.DrawString(cname, aFont, Brushes.Black, 410, 375)
+
+        For y = 30 To 280 Step 10
+            g.DrawLine(Pens.PeachPuff, 0, y, Image.Width, y)
+        Next
+
+    End Sub
+    Private Sub gnarledtree(ByVal x0, ByVal y0, ByVal distance)
+        distance = distance
+        ' y0 = Image.Height
+        Dim thickness, trunkheight, n, nn, rsi, base As Integer
+        Dim bwidth, thik, nthik, pixtrkhgt, pixtrkseg, boughLLx, boughLLy, Lx, Ly, Rx, Ry As Single
+        Dim boughLx(8), boughLy(8), boughRx(8), boughRy(8)
+
+        thickness = 1 'randh(2, 4) 'bottom thickness of tree, in feet
+        trunkheight = 2 'randh(8, 12)    'length of trunk in feet - upwards 
+        pixtrkhgt = pixelheight(trunkheight, distance)
+        pixtrkseg = pixtrkhgt / 2    ' pixel distance for each segment of bough - fixed
+        thik = pixelheight(thickness, distance) 'width at beginning portion of trunk
+        nthik = thik
+        bwidth = thik / 40
+        'initial point
+        For nn = 1 To 3
+            For n = 1 To 4
+                If base = 0 Then  'set up the beginning base coordinates for each trunk segment
+                    boughLx(0) = x0
+                    boughLy(0) = y0
+                    boughRx(0) = x0 + thik
+                    boughRy(0) = y0
+                    base = 1
+                Else
+                    boughLx(0) = Lx
+                    boughLy(0) = Ly + 1
+                    boughRx(0) = Rx
+                    boughRy(0) = Ry
+                End If
+                rsi = randsign() * 1
+                For i As Integer = 1 To 8
+                    thik -= bwidth : If thik < 2 Then thik = 2
+                    boughLLx = boughLx(i - 1) + yrand(pixtrkseg) * rsi
+                    boughLLy = boughLy(i - 1) - pixtrkseg + yrand(6) / 10 * pixtrkseg
+                    boughLx(i) = boughLLx
+                    boughLy(i) = boughLLy
+                    boughRx(i) = boughLx(i) + thik * 0.4
+                    boughRy(i) = boughLy(i)
+                Next i
+
+                Dim point0 As New Point(boughLx(0), boughLy(0))
+                Dim point1 As New Point(boughLx(1), boughLy(1))
+                Dim point2 As New Point(boughLx(2), boughLy(2))
+                Dim point3 As New Point(boughLx(3), boughLy(3))
+                Dim point4 As New Point(boughLx(4), boughLy(4))
+                Dim point5 As New Point(boughLx(5), boughLy(5))
+                Dim point6 As New Point(boughRx(5), boughRy(5))
+                Dim point7 As New Point(boughRx(4), boughRy(4))
+                Dim point8 As New Point(boughRx(3), boughRy(3))
+                Dim point9 As New Point(boughRx(2), boughRy(2))
+                Dim point10 As New Point(boughRx(1), boughRy(1))
+                Dim point11 As New Point(boughRx(0), boughRy(0))
+
+                Dim gnarl As Point() = {point0, point1, point2, point3, point4, point5, point6, point7, point8, _
+                           point9, point10, point11}
+
+
+                Dim gnarly = New Drawing2D.GraphicsPath
+                gnarly.AddCurve(gnarl)
+                g.SetClip(gnarly)
+                Dim subject As String = "gnarly"
+                colorblend(gnarly.GetBounds.X, gnarly.GetBounds.Y, gnarly.GetBounds.Width, _
+                        gnarly.GetBounds.Height, subject, 0)
+                g.ResetClip()
+                If Settings.Outlines = True Then g.DrawPath(stainedglasspen, gnarly)
+                bushleaves(gnarly.getbounds.x, gnarly.getbounds.y, distance)
+
+                Lx = boughLx(5) : Ly = boughLy(5) : Rx = boughRx(5) : Ry = boughRy(5)
+            Next n
+            base = 0 : thik = nthik * randh(7, 10) / 10 : x0 += thik * 0.75
+        Next nn
+    End Sub
+    Private Sub bush(ByVal x0, ByVal y0, ByVal distance)
+        Dim n As Integer
+
+        'makes one bush
+        For n = 1 To 3
+            gnarledtree(x0, y0, distance)
+            distance += 10
+
+        Next
+
+    End Sub
+    Private Sub lonepine()
+        distance = randh(60, 100)
+        Dim bottomwidth, trunkheight, trkht, botwidth, twidth As Single
+        Dim leaves As String = ""
+        Dim test As String = ""
+        Dim large As String = ""
+        Dim midl As String = ""
+        Dim small As String = ""
+        Dim xe, ye, r, p, leaftype, s1, s2, m1, m2, L1, L2 As Integer
+        Dim trunkLx(13), trunkR_x(13), trunkLy(13), trunkR_y(13)
+        Dim r_path As New Drawing2D.GraphicsPath
+        Dim x, y As Double
+        x = randh(20, 300)
+        y = Image.Height
+        bottomwidth = 1.0   '   in feet
+        botwidth = pixelheight(bottomwidth, distance)
+
+treetrunk:
+        Dim trunky_path As New Drawing2D.GraphicsPath
+        For n As Integer = 1 To 1  'Optional series of trees
+            x += randh(25, 34)
+            trunkheight = randh(6, 6) 'trunk segment lengths to work with
+            trkht = pixelheight(trunkheight, distance)
+            trunkLx(0) = x
+            trunkLy(0) = y
+            trunkR_x(0) = x + botwidth
+            trunkR_y(0) = y
+            twidth = botwidth / 11
+            If yrand(9) > 4 Then
+                For i As Integer = 1 To 12
+                    botwidth -= twidth
+                    trunkLx(i) = (trunkLx(i - 1) + randsign() * yrand(5))
+                    trunkLy(i) = (trunkLy(i - 1) - randh(5, trkht))
+                    trunkR_x(i) = (trunkLx(i) + botwidth)
+                    If trunkR_x(i) - trunkLx(i) < 1 Then trunkR_x(i) += 1
+                    trunkR_y(i) = trunkLy(i)
+                Next
+            Else
+                For i As Integer = 1 To 12
+                    botwidth -= twidth
+                    trunkLx(i) = (trunkLx(i - 1)) '+ randsign() * yrand(5))
+                    trunkLy(i) = (trunkLy(i - 1) - randh(5, trkht))
+                    trunkR_x(i) = (trunkLx(i) + botwidth)
+                    trunkR_y(i) = trunkLy(i)
+                Next
+            End If
+
+            Dim point0 As New Point(trunkLx(0), trunkLy(0))
+            Dim point1 As New Point(trunkLx(1), trunkLy(1))
+            Dim point2 As New Point(trunkLx(2), trunkLy(2))
+            Dim point3 As New Point(trunkLx(3), trunkLy(3))
+            Dim point4 As New Point(trunkLx(4), trunkLy(4))
+            Dim point5 As New Point(trunkLx(5), trunkLy(5))
+            Dim point6 As New Point(trunkLx(6), trunkLy(6))
+            Dim point7 As New Point(trunkLx(7), trunkLy(7))
+            Dim point8 As New Point(trunkLx(8), trunkLy(8))
+            Dim point9 As New Point(trunkLx(9), trunkLy(9))
+            Dim point10 As New Point(trunkLx(10), trunkLy(10))
+            Dim point11 As New Point(trunkLx(11), trunkLy(11))
+            Dim point12 As New Point(trunkLx(12), trunkLy(12))
+            Dim point13 As New Point(trunkR_x(12), trunkR_y(12))
+            Dim point14 As New Point(trunkR_x(11), trunkR_y(11))
+            Dim point15 As New Point(trunkR_x(10), trunkR_y(10))
+            Dim point16 As New Point(trunkR_x(9), trunkR_y(9))
+            Dim point17 As New Point(trunkR_x(8), trunkR_y(8))
+            Dim point18 As New Point(trunkR_x(7), trunkR_y(7))
+            Dim point19 As New Point(trunkR_x(6), trunkR_y(6))
+            Dim point20 As New Point(trunkR_x(5), trunkR_y(5))
+            Dim point21 As New Point(trunkR_x(4), trunkR_y(4))
+            Dim point22 As New Point(trunkR_x(3), trunkR_y(3))
+            Dim point23 As New Point(trunkR_x(2), trunkR_y(2))
+            Dim point24 As New Point(trunkR_x(1), trunkR_y(1))
+            Dim point25 As New Point(trunkR_x(0), trunkR_y(0))
+
+            Dim trunkypoints As Point() = {point0, point1, point2, point3, point4, point5, _
+                point6, point7, point8, point9, point10, point11, point12, point13, _
+                point14, point15, point16, point17, point18, point19, point20, point21, _
+                point22, point23, point24, point25}
+
+            trunky_path.AddCurve(trunkypoints, 0.3)
+            g.SetClip(trunky_path)
+            colorblend(trunky_path.GetBounds.X, trunky_path.GetBounds.Y, trunky_path.GetBounds.Width, _
+            trunky_path.GetBounds.Height, "pinetree", n)
+            g.ResetClip()
+            If Settings.Outlines = True Then g.DrawPath(outlinepen, trunky_path)
+
+deadbbranches:
+            'Place a number of dead branches on tree
+            Dim thickness As Single
+            For r = 1 To 10
+                p = randh(1, 12)   'on which step of the tree to put it, 11 being highest step
+                If p > 8 Then p = p - 8
+                xe = trunkLx(p)
+                ye = trunkLy(p) + randsign() * yrand(trkht / 3)
+                thickness = Math.Abs(trunkLx(p) - trunkR_x(p))
+                pinebough(xe, ye, thickness, distance)
+            Next
+            If yrand(10) < 2 Then Return
+
+
+treefoliage:
+            ' Now place foliage on tree
+            If yrand(9) > 3 Then  'more weight on down-leafed trees
+                s1 = 0 : s2 = 6 : m1 = 7 : m2 = 23 : L1 = 24 : L2 = 40
+            Else
+                s1 = 0 : s2 = 5 : m1 = 6 : m2 = 19 : L1 = 20 : L2 = 40
+            End If
+            large = ""
+            For r = 1 To 6 ' no. of leaf clusters to place on tree
+                p = randh(2, 12)   'on which step of the tree to put it, 11 being highest step
+                xe = trunkLx(p) : ye = trunkLy(p)
+                If p < 6 Then
+                    leaftype = randh(L1, L2)    'large sized leaf cluster
+                    test = CStr(leaftype)
+                    If InStr(large, test) > 0 Then GoTo next_one
+                    large = large + " " + test
+                ElseIf p > 5 And p < 10 Then
+                    leaftype = randh(m1, m2)     'middle-sized leaf cluster
+                    test = CStr(leaftype)
+                    If InStr(midl, test) > 0 Then GoTo next_one
+                    midl = midl + " " + test
+                ElseIf p > 9 Then
+                    leaftype = randh(s1, s2)      'smallest size leaf cluster
+                    test = CStr(leaftype)
+                    If InStr(small, test) > 0 Then GoTo next_one
+                    small = small + " " + test
+                End If
+                leaves = pineleaf_up(leaftype)
+                pineleaves(xe, ye, distance, leaves, r)
+                If r = 4 Then
+                    g.FillClosedCurve(Brushes.Black, trunkypoints)
+                End If
+next_one:   Next r
+        Next n
+
+    End Sub
+    Private Sub pinebough(ByVal x0, ByVal y0, ByVal thickness, ByVal distance) 'from lonepine
+
+        Dim boulength, bou_segment, m, branchangle, LR As Integer
+        Dim blen, bwidth, thik As Double
+        Dim boughLx(7), boughLy(7), boughRx(7), boughRy(7)
+        boulength = randh(5, 12)    'full length of bough in feet - upwards then turned 90o
+        blen = pixelheight(boulength, distance)
+        bou_segment = blen / 6     ' pixel distance for each segment or bough
+        boughLx(0) = x0 + thickness * 0.5  'thickness is of the tree trunk, in points 
+        boughLy(0) = y0
+        thik = (randh(15, 30) / 100) * thickness
+        If thik < 1 Then thik = 1
+        boughRx(0) = x0 + thik
+        boughRy(0) = y0
+        m = 5
+        bwidth = thik / m
+        LR = randsign()
+        If LR > 0 Then
+            For i As Integer = 1 To m
+                thik -= bwidth : If thik < 2 Then thik = 2
+                boughLx(i) = boughLx(i - 1) + i / m * bou_segment + randsign() * yrand(bou_segment / 4)
+                boughLy(i) = boughLy(i - 1) - (m - i) / m * bou_segment + randsign() * yrand(bou_segment / 4)
+                boughRx(i) = boughLx(i) + thik
+                boughRy(i) = boughLy(i)
+            Next
+        Else
+            ' boughLx(0) = x0 + thickness * 2
+            For i As Integer = 1 To m
+                thik -= bwidth : If thik < 2 Then thik = 2
+                boughLx(i) = boughLx(i - 1) - i / m * bou_segment + randsign() * yrand(bou_segment / 3)
+                boughLy(i) = boughLy(i - 1) - (m - i) / m * bou_segment + randsign() * yrand(bou_segment / 3)
+                boughRx(i) = boughLx(i) - thik
+                boughRy(i) = boughLy(i)
+            Next
+        End If
+
+        Dim point0 As New Point(boughLx(0), boughLy(0))
+        Dim point1 As New Point(boughLx(1), boughLy(1))
+        Dim point2 As New Point(boughLx(2), boughLy(2))
+        Dim point3 As New Point(boughLx(3), boughLy(3))
+        Dim point4 As New Point(boughLx(4), boughLy(4))
+        Dim point5 As New Point(boughLx(5), boughLy(5))
+        Dim point6 As New Point(boughLx(5), boughLy(5))
+        Dim point7 As New Point(boughRx(4), boughRy(4))
+        Dim point8 As New Point(boughRx(3), boughRy(3))
+        Dim point9 As New Point(boughRx(2), boughRy(2))
+        Dim point10 As New Point(boughRx(1), boughRy(1))
+        Dim point11 As New Point(boughRx(0), boughRy(0))
+
+        If LR < 0 Then
+            Dim pinebough As Point() = {point0, point1, point2, point3, point4, point5, point6, point7, point8, _
+            point9, point10, point11}
+            branchangle = randh(-80, -150)
+            Rotate(boughLx(0), boughLy(0), branchangle)
+            g.FillClosedCurve(Brushes.Black, pinebough, 0.3)
+            RotateBack(boughLx(0), boughLy(0), branchangle)
+        Else
+            Dim pinebough As Point() = {point11, point1, point2, point3, point4, point5, point6, point7, point8, _
+                       point9, point10, point0}
+            branchangle = randh(80, 150)
+            Rotate(boughLx(0), boughLy(0), branchangle)
+            g.FillClosedCurve(Brushes.Black, pinebough, 0.3)
+            RotateBack(boughLx(0), boughLy(0), branchangle)
+        End If
+    End Sub
+
+    Private Sub pineleaves(ByVal x0, ByVal y0, ByVal distance, ByVal leaves, ByVal r) 'from lonepine
+        Dim x(5), y(5) As Integer
+        Dim i, w, cluster As Integer
+        Dim j, k As String
+        ' Dim pine As New Drawing2D.GraphicsPath()
+        cluster = 5                         'average size of leaf cluster in feet - arbitrary
+        w = pixelheight(cluster, distance)
+
+
+        For i = 1 To 5
+            j = Mid(leaves, i * 4, 3)
+
+            x(i) = CInt(j)
+            If i > 1 Then
+                x(i) = (x(i) - x(1)) / Math.Sqrt(distance / 4) + x0 - w / 4
+                '(distance / 100 * 8) + x0 - w / 4
+            End If
+            x(1) = x0
+        Next
+        For i = 1 To 5
+            k = Mid(leaves, (i + 5) * 4, 3)
+            y(i) = CInt(k)
+            If i > 1 Then
+                y(i) = (y(i) - y(1)) / Math.Sqrt(distance / 4) + y0 + w / 2
+                '(distance / 100 * 8) + y0 + w / 2
+            End If
+            y(1) = y0
+        Next
+
+        Dim point1 As New Point(x(1), y(1))
+        Dim point2 As New Point(x(2), y(2))
+        Dim point3 As New Point(x(3), y(3))
+        Dim point4 As New Point(x(4), y(4))
+        Dim point5 As New Point(x(5), y(5))
+        Dim point6 As New Point(x(1), y(1))
+        Dim pinebranch As Point() = {point1, point2, point3, point4, point5, point6}
+
+        Dim pinepath As New Drawing2D.GraphicsPath
+        pinepath.AddCurve(pinebranch)
+        g.SetClip(pinepath)
+        colorblend(pinepath.GetBounds.X, pinepath.GetBounds.Y, _
+        pinepath.GetBounds.Width, pinepath.GetBounds.Height, "pineleaves", r)
+        g.ResetClip()
+        If Settings.Outlines = True Then g.DrawPath(outlinepen, pinepath)
+        'g.FillClosedCurve(Brushes.Green, pinebranch, -0.5)
+
+    End Sub
+    Private Function pineleaf_down(ByVal leaftype)
+        Dim leaves As String = "333333"
+
+        If leaftype = 0 Then
+            leaves = "   200 070 164 103 200 070 188 091 269 121"   '208 Ds
+        ElseIf leaftype = 1 Then
+            leaves = "   200 207 162 165 200 283 087 302 338 120"   '254 Ds
+        ElseIf leaftype = 2 Then
+            leaves = "   200 188 274 220 200 364 146 375 190 157"   '249 Ds
+        ElseIf leaftype = 3 Then
+            leaves = "   200 111 273 124 200 153 281 087 032 083"   '243 Ds
+        ElseIf leaftype = 4 Then
+            leaves = "   200 065 122 272 200 109 210 219 041 118"   '246 Ds
+        ElseIf leaftype = 5 Then
+            leaves = "   200 187 180 180 200 058 152 337 042 022"   '232 Ds
+        ElseIf leaftype = 6 Then
+            leaves = "   200 070 164 103 200 070 188 091 269 121"   '208 Dm
+        ElseIf leaftype = 7 Then
+            leaves = "   200 259 013 306 200 172 134 325 052 248"   '199 Dm
+        ElseIf leaftype = 8 Then
+            leaves = "   200 072 262 254 200 148 216 005 190 206"   '193 Dm
+        ElseIf leaftype = 9 Then
+            leaves = "   200 308 100 262 200 166 020 280 320 307"   '252 Dm
+        ElseIf leaftype = 10 Then
+            leaves = "   200 374 298 319 200 140 336 321 306 006"   '251 Dm
+        ElseIf leaftype = 11 Then
+            leaves = "   200 035 158 370 200 339 369 340 110 154"   '247 Dm
+        ElseIf leaftype = 12 Then
+            leaves = "   200 201 249 067 200 109 189 321 156 047"   '245 Dm
+        ElseIf leaftype = 13 Then
+            leaves = "   200 338 203 289 200 087 228 003 222 139"   '198 Dm
+        ElseIf leaftype = 14 Then
+            leaves = "   200 269 267 128 200 049 232 311 148 062"   '226 Dm
+        ElseIf leaftype = 15 Then
+            leaves = "   200 296 202 064 200 095 161 010 268 005"   '241 Dm
+        ElseIf leaftype = 16 Then
+            leaves = "   200 099 143 247 200 139 308 324 339 084"   '220 Dm
+        ElseIf leaftype = 17 Then
+            leaves = "   200 097 003 248 200 071 138 172 057 251"   '153 Dm
+        ElseIf leaftype = 18 Then
+            leaves = "   200 295 040 271 200 046 119 233 061 093"   '216 Dm
+        ElseIf leaftype = 19 Then
+            leaves = "   200 328 263 380 200 385 129 050 165 270"   '182 Dm
+        ElseIf leaftype = 20 Then
+            leaves = "   200 171 310 366 200 388 046 324 236 135"   '195 Dl
+        ElseIf leaftype = 21 Then
+            leaves = "   200 053 329 096 200 345 305 145 255 148"   '200 Dl
+        ElseIf leaftype = 22 Then
+            leaves = "   200 025 099 105 200 010 387 280 313 052"   '242 Dl
+        ElseIf leaftype = 23 Then
+            leaves = "   200 254 046 132 200 039 221 238 096 075"   '244 Dl
+        ElseIf leaftype = 24 Then
+            leaves = "   200 262 231 105 200 097 096 302 248 066"   '236 Dl
+        ElseIf leaftype = 25 Then
+            leaves = "   200 012 356 271 200 139 296 069 067 169"   '183 Dl
+        ElseIf leaftype = 26 Then
+            leaves = "   200 371 296 184 200 030 114 307 255 072"   '240 Dl
+        ElseIf leaftype = 27 Then
+            leaves = "   200 339 292 034 200 226 109 022 146 042"   '234 Dl
+        ElseIf leaftype = 28 Then
+            leaves = "   200 014 231 071 200 390 354 108 379 379"   '172 Dl
+        ElseIf leaftype = 29 Then
+            leaves = "   200 070 234 378 200 196 277 041 210 237"   '223 Dl
+        ElseIf leaftype = 30 Then
+            leaves = "   200 025 205 246 200 244 257 060 310 177"   '228 Dl
+        ElseIf leaftype = 31 Then
+            leaves = "   200 354 153 357 200 270 282 035 152 113"   '213 Dl
+        ElseIf leaftype = 32 Then
+            leaves = "   200 374 074 023 200 064 222 180 228 002"   '214 Dl
+        ElseIf leaftype = 33 Then
+            leaves = "   200 398 349 022 200 047 172 288 304 145"   '210 Dl
+        ElseIf leaftype = 34 Then
+            leaves = "   200 301 037 077 200 327 081 091 332 059"    '192 Dl
+        ElseIf leaftype = 35 Then
+            leaves = "   200 371 394 281 200 207 364 229 149 136"   '186 Dl
+        ElseIf leaftype = 36 Then
+            leaves = "   200 379 354 226 200 286 348 225 018 086"   '190 Dl
+        ElseIf leaftype = 37 Then
+            leaves = "   200 336 216 050 200 177 063 336 337 226"   '191 Dl
+        ElseIf leaftype = 38 Then
+            leaves = "   200 365 305 378 200 019 073 058 294 316"   '170 Dl
+        ElseIf leaftype = 39 Then
+            leaves = "   200 053 256 357 200 015 093 031 238 237"   '167 Dl
+        ElseIf leaftype = 40 Then
+            leaves = "   200 323 016 298 200 038 001 223 303 111"   '161 Dl
+
+        End If
+        Return leaves
+    End Function
+    Private Function pineleaf_up(ByVal leaftype)
+        Dim leaves As String = "333333"
+
+        If leaftype = 0 Then
+            leaves = "   200 300 150 172 200 092 023 083 020 112"  ' 196, Us
+        ElseIf leaftype = 1 Then
+            leaves = "   200 328 322 159 200 045 122 057 095 070"   '235, Us
+        ElseIf leaftype = 2 Then
+            leaves = "   200 295 372 279 200 157 137 217 020 162"   '233, Us
+        ElseIf leaftype = 3 Then
+            leaves = "   200 180 148 200 200 044 037 037 032 028"   '227, Us
+        ElseIf leaftype = 4 Then
+            leaves = "   200 322 331 155 200 062 143 122 010 186"   '215, Us
+        ElseIf leaftype = 5 Then
+            leaves = "   200 144 013 211 200 099 074 014 125 274"   '222, Us
+        ElseIf leaftype = 6 Then
+            leaves = "   200 062 056 179 200 086 097 103 032 118"   '187, Us
+        ElseIf leaftype = 7 Then
+            leaves = "   200 393 294 225 200 310 171 342 333 037"   '205, Um
+        ElseIf leaftype = 8 Then
+            leaves = "   200 062 330 380 200 185 233 284 247 177"   '201, Um
+        ElseIf leaftype = 9 Then
+            leaves = "   200 338 239 100 200 088 176 268 165 198"   '255, Um
+        ElseIf leaftype = 10 Then
+            leaves = "   200 025 063 120 200 331 266 298 308 331"   '253, Um
+        ElseIf leaftype = 11 Then
+            leaves = "   200 323 197 150 200 002 115 180 200 088"   '194, Um
+        ElseIf leaftype = 12 Then
+            leaves = "   200 326 264 362 200 352 145 280 341 280"   '229, Um
+        ElseIf leaftype = 13 Then
+            leaves = "   200 100 087 392 200 091 019 041 168 094"   '230, Um
+        ElseIf leaftype = 14 Then
+            leaves = "   200 306 155 363 200 267 047 007 130 044"   '217, Um
+        ElseIf leaftype = 15 Then
+            leaves = "   200 054 242 284 200 288 184 226 106 306"   '221, Um
+        ElseIf leaftype = 16 Then
+            leaves = "   200 313 220 151 200 119 087 255 052 119"   '219, Um
+        ElseIf leaftype = 17 Then
+            leaves = "   200 180 068 281 200 167 131 196 042 246"   '218, Um
+        ElseIf leaftype = 18 Then
+            leaves = "   200 187 373 101 200 137 074 040 136 103"   '184, Um
+        ElseIf leaftype = 19 Then
+            leaves = "   200 305 354 371 200 180 216 249 117 091"   '209, Um
+        ElseIf leaftype = 20 Then
+            leaves = "   200 164 035 156 200 216 263 084 243 259"   '212, Um
+        ElseIf leaftype = 21 Then
+            leaves = "   200 350 164 102 200 222 234 108 163 378"   '171, Um
+        ElseIf leaftype = 22 Then
+            leaves = "   200 084 349 349 200 241 210 091 244 147"   '152, Um
+        ElseIf leaftype = 23 Then
+            leaves = "   200 303 045 249 200 025 098 077 001 082"   '143, Um
+        ElseIf leaftype = 24 Then
+            leaves = "   200 388 321 045 200 001 134 278 012 059"   '250, UL
+        ElseIf leaftype = 25 Then
+            leaves = "   200 089 225 316 200 058 181 308 076 095"   '248, UL
+        ElseIf leaftype = 26 Then
+            leaves = "   200 111 381 277 200 362 180 121 171 175"   '239, UL
+        ElseIf leaftype = 27 Then
+            leaves = "   200 067 364 378 200 036 158 237 237 213"   '237, UL
+        ElseIf leaftype = 28 Then
+            leaves = "   200 067 173 378 200 311 215 031 150 197"   '231, UL
+        ElseIf leaftype = 29 Then
+            leaves = "   200 041 111 286 200 229 125 234 255 090"   '225, UL
+        ElseIf leaftype = 30 Then
+            leaves = "   200 363 149 048 200 281 052 137 043 032"   '224, UL
+        ElseIf leaftype = 31 Then
+            leaves = "   200 137 340 351 200 239 125 112 285 326"   '211, UL
+        ElseIf leaftype = 32 Then
+            leaves = "   200 063 119 019 200 072 071 221 258 392"   '203, UL
+        ElseIf leaftype = 33 Then
+            leaves = "   200 283 377 263 200 089 009 134 223 236"   '177, UL
+        ElseIf leaftype = 34 Then
+            leaves = "   200 392 063 046 200 277 350 117 141 189"   '173, UL
+        ElseIf leaftype = 35 Then
+            leaves = "   200 065 342 107 200 259 343 250 223 048"   '163, UL
+        ElseIf leaftype = 36 Then
+            leaves = "   200 157 354 145 200 302 384 024 093 105"   '162, UL
+        ElseIf leaftype = 37 Then
+            leaves = "   200 131 304 383 200 189 167 096 012 350"   '156, UL
+        ElseIf leaftype = 38 Then
+            leaves = "   200 106 111 025 200 328 345 238 047 002"   '145, UL
+        ElseIf leaftype = 39 Then
+            leaves = "   200 053 256 357 200 015 093 031 238 237"   '167 Dl
+        ElseIf leaftype = 40 Then
+            leaves = "   200 323 016 298 200 038 001 223 303 111"   '161 Dl
+
+
+        End If
+        Return leaves
+    End Function
+
+    Private Sub beziertrial()
+        Dim x, y, a1, a2, a3, a4, a5, b1, b2, b3, b4, b5, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, _
+        w, cluster, gi, girth As Integer
+        Dim bezi As New Drawing2D.GraphicsPath()
+        cluster = 14 'average width of leaf cluster in feet - arbitrary
+        distance = 150
+        w = pixelheight(cluster, distance)
+        x = 350
+        y = 80
+        girth = 1
+        gi = pixelheight(girth, distance)
+        g.FillRectangle(Brushes.DarkGray, x, y, gi, 330)
+
+        a1 = w / 2
+        a2 = yrand(w)
+        a3 = yrand(w)
+        a4 = yrand(w)
+        a5 = a1
+
+        x1 = a1 + x - w / 2
+        x2 = a2 + x - w / 2
+        x3 = a3 + x - w / 2
+        x4 = a4 + x - w / 2
+        x5 = a5 + x - w / 2
+
+        b1 = yrand(w)
+        b2 = yrand(w)
+        b3 = yrand(w)
+        b4 = yrand(w)
+        b5 = yrand(w)
+
+        y1 = b1 + y - w / 2
+        y2 = b2 + y - w / 2
+        y3 = b3 + y - w / 2
+        y4 = b4 + y - w / 2
+        y5 = b5 + y - w / 2
+
+
+        Dim point0 As New Point(x1, y1)
+        Dim point1 As New Point(x2, y2)
+        Dim point2 As New Point(x3, y3)
+        Dim point3 As New Point(x4, y4)
+        Dim point4 As New Point(x5, y5)
+        Dim leaf As Point() = {point0, point1, point2, point3, point4}
+
+
+
+        bezi.AddBezier(New Point(x1, y1), New Point(x2, y2), _
+          New Point(x3, y3), New Point(x4, y4))
+        ' g.SetClip(bezi)
+        'colorblend(bezi.GetBounds.X, bezi.GetBounds.Y, bezi.GetBounds.Width, bezi.GetBounds.Height, "leaves", 3)
         'g.ResetClip()
 
+        g.DrawString("                    w= " & w & "          a1= " & a1 & "    a2= " & a2 & "    a3= " & a3 & "    a4= " & a4 & "   a5= " & a5, _
+        New Font("arial", 10), Brushes.Black, New RectangleF(16, 2, 800, 16))
+        g.DrawString("                    x= " & x & "          b1= " & b1 & "    b2= " & b2 & "    b3= " & b3 & "    b4= " & b4 & "   b5= " & b5, _
+        New Font("arial", 10), Brushes.Black, New RectangleF(16, 22, 800, 16))
+
+        g.DrawLines(Pens.Orange, leaf)
+        g.FillRectangle(Brushes.Black, x, y, 5, 5)
+        g.FillRectangle(Brushes.Red, x1, y1, 4, 4)
+        g.FillRectangle(Brushes.Red, x2, y2, 4, 4)
+        g.FillRectangle(Brushes.Red, x3, y3, 4, 4)
+        g.FillRectangle(Brushes.Red, x4, y4, 4, 4)
+        g.FillRectangle(Brushes.Red, x5, y5, 4, 4)
+
     End Sub
+    Private Sub Lombardy()
+        Dim n, x, wid, hgt, x0, lx, rx, bottomy, beginy, midptx As Integer
+        Dim ht As Single
+        distance = randh(240, 500)
+        x = 100 'to be declared on ref
+        x0 = x
+        bottomy = Image.Height - 160
 
-    Private Sub bezierbranches()
-
-        ' -----------------------------------------Attemping Bezier combo's as leaves
-        Dim peni As New Pen(Color.Khaki, 1)
-        Dim bezi As New Drawing2D.GraphicsPath()
-        Dim bezi2 As New Drawing2D.GraphicsPath()
-        Dim brush5 As New SolidBrush(Color.Green)
-        Dim i As Integer = 0
-        Dim j As Integer = 0
-        Dim w As Integer = 160
-        Dim cx2 As Integer = 60
-        Dim cy2 As Integer = 70
-
-
-        For j = 1 To 2
+        For n = 0 To 5
+            ' x = x0 + randh(20, 150)
+            hgt = randh(90, 100) 'in feet
+            ht = pixelheight(hgt, distance)
+            wid = ht / 12
+            midptx = wid / 2 + x
+            lx = x - (wid / 4) - 4
+            rx = x + wid + 5
+            beginy = bottomy - ht / 10
             For i = 1 To 3
+                Dim point0 As New Point(x, beginy)
+                Dim point1 As New Point(lx, beginy - ht / 1.4)
+                Dim point2 As New Point(midptx + randsign() * yrand(10), beginy - ht + randsign() * yrand(5))
+                Dim point3 As New Point(rx, beginy - ht / 1.5)
+                Dim point4 As New Point(x + wid, beginy)
+                '  Dim point5 As New Point(midptx, beginy + 10)
 
-                Dim x1 As Integer = yrand(w) + cx2
-                Dim x2 As Integer = yrand(w) + cx2
-                Dim x3 As Integer = yrand(w) + cx2
-                Dim x4 As Integer = yrand(w) + cx2
-                Dim y1 As Integer = yrand(w) + cy2
-                Dim y2 As Integer = yrand(w) + cy2
-                Dim y3 As Integer = yrand(w) + cy2
-                Dim y4 As Integer = yrand(w) + cy2
+                '  Dim pfull As Point() = {point0, point2, point4}
 
-                If j = 1 Then
-                    bezi.AddBezier(New Point(x1, y1), New Point(x2, y2), _
-            New Point(x3, y3), New Point(x4, y4))
-                    g.FillPath(brush5, bezi)
-                    g.DrawBezier(New Pen(Color.Khaki, 2), New Point(x1, y1), New Point(x2, y2), _
-                    New Point(x3, y3), New Point(x4, y4))
+                Dim lombfull As Point() = {point0, point1, point2, point3, point4}
+                Dim lombardy = New Drawing2D.GraphicsPath
+                lombardy.addclosedcurve(lombfull)
+                g.SetClip(lombardy)
 
-                    bezi.Flatten()
-                Else
-                    bezi2.AddBezier(New Point(x1, y1), New Point(x2, y2), _
-                                New Point(x3, y3), New Point(x4, y4))
-                    g.FillPath(brush5, bezi2)
-                    g.DrawBezier(New Pen(Color.Moccasin, 2), New Point(x1, y1), New Point(x2, y2), _
-                     New Point(x3, y3), New Point(x4, y4))
+                colorblend(lombardy.getbounds.x, lombardy.getbounds.y, lombardy.getbounds.width, _
+                 lombardy.getbounds.height, "lombardy", 0)
 
-                    'bezi2.Flatten()
-                End If
+                'g.FillClosedCurve(Brushes.Green, pfull, -0.5)
+                g.ResetClip()
+                If Settings.Outlines = True Then g.DrawPath(outlinepen, lombardy)
             Next
-            g.DrawPath(peni, bezi)
-            cy2 = 220
-        Next
-        g.DrawPath(peni, bezi2)
-    End Sub
+            'Lombardy trunk
+            'using bottomy as the very bottom of the tree - the trunk roots
+            Dim startx, starty, y1, rtbotx, midbotx As Integer
 
+            startx = x + wid / 3
+            starty = bottomy + hgt / 3
+
+            rtbotx = startx + wid * 0.3
+            midbotx = startx + (rtbotx - startx) / 2
+            For i = 1 To 3
+                y1 = bottomy - hgt / 2 - randh(hgt / 2, hgt)   'height of trunk
+                Dim point6 As New Point(startx, bottomy) 'bottom left
+                Dim point7 As New Point(midptx + randsign() * yrand(wid / 2), y1) 'point
+                Dim point8 As New Point(rtbotx, bottomy) 'bottom right
+                Dim point9 As New Point(midbotx, bottomy * 1.06) 'midbottom
+
+                Dim trunk As Point() = {point6, point7, point8, point9}
+                Dim lombardy = New Drawing2D.GraphicsPath
+                lombardy.addclosedcurve(trunk)
+                g.SetClip(lombardy)
+
+                colorblend(lombardy.getbounds.x, lombardy.getbounds.y, lombardy.getbounds.width, _
+                 lombardy.getbounds.height, "lombardy", 0)
+                ' g.FillClosedCurve(Brushes.Gray, trunk, -0.5)
+                g.ResetClip()
+                If Settings.Outlines = True Then g.DrawPath(outlinepen, lombardy)
+            Next i
+
+            x += wid * 3
+
+        Next
+    End Sub
     Private Sub deciduous()
 
-
-        Dim wd, w, h, ht, x, y, n As Integer
+        Dim wd, w, h, ht, n, i, j, v, topx, topy, wdd, htt, basex, basey, basefoliagey As Integer
         Dim foliage_x(12), foliage_y(12)
+        distance = 120 'randh(50, 150)
+        basex = yrand(600)
+        basey = 450 '300 'true base
+        For v = 1 To 2
+            basex = yrand(600)
+            For j = 1 To 1
+                w = 25 'normal width of tree in feet
+                h = 40 'normal height of tree in feet
+                wd = pixelheight(w, distance)
+                ht = pixelheight(h, distance)
+                topx = basex
 
-        x = 400
-        y = 60
-        w = 100
-        h = 160
-        wd = w / 9
-        ht = h / 3
-        Dim rect As New Rectangle(x, y, w, h)
-        g.DrawRectangle(Pens.Plum, rect)
-        For n = 0 To 9
-            foliage_x(n) = x + n * wd
-            foliage_y(n) = y + yrand(ht)
+                topy = basey - ht '  top of tree
+                wdd = wd / 9 'increments to work with
+                htt = ht / 3
+
+                basefoliagey = basey - ht * 0.45
+
+                'Dim rect As New Rectangle(topx, topy, wd, ht)
+                'g.FillRectangle(Brushes.Coral, rect)
+
+                Dim decid As New Drawing2D.GraphicsPath
+                foliage_x(0) = basex
+                foliage_y(0) = basefoliagey
+                For n = 1 To 9
+                    foliage_x(n) = basex + n * wdd + randsign() * yrand(wdd)
+                    foliage_y(n) = basefoliagey + randsign() * yrand(htt / 1.5)
+                Next
+
+                Dim point0 As New Point(foliage_x(0), foliage_y(0))
+                Dim point1 As New Point(foliage_x(1), foliage_y(1))
+                Dim point2 As New Point(foliage_x(2), foliage_y(2))
+                Dim point3 As New Point(foliage_x(3), foliage_y(3))
+                Dim point4 As New Point(foliage_x(4), foliage_y(4))
+                Dim point5 As New Point(foliage_x(5), foliage_y(5))
+                Dim point6 As New Point(foliage_x(6), foliage_y(6))
+                Dim point7 As New Point(foliage_x(7), foliage_y(7))
+                Dim point8 As New Point(foliage_x(8), foliage_y(8))
+                Dim point9 As New Point(foliage_x(9), foliage_y(9))
+                Dim point10 As New Point(foliage_x(9) - wd / 5, topy)
+                Dim point11 As New Point(foliage_x(1) + wd / 4, topy)
+
+                Dim leaves As Point() = {point0, point1, point2, point3, point4, point5, point6, _
+               point7, point8, point9, point10, point11}
+                decid.AddClosedCurve(leaves)
+
+                'g.SetClip(decid)
+                'colorblend(decid.GetBounds.X, decid.GetBounds.Y, decid.GetBounds.Width, _
+                '       decid.GetBounds.Height, "deciduous", 2)
+                'g.ResetClip()
+                'If Settings.Outlines = "true" Then g.DrawPath(outlinepen, decid)
+
+trunk:          '-------------------place trunk---------------
+                If j < 3 Then
+                    Dim bottomwidth, botwidth, trksg, twidth, trkht As Single
+                    Dim trunkLx(6), trunkLy(6), trunkRx(6), trunkRy(6)
+                    bottomwidth = 1.3   '   in feet
+
+                    Dim trunk_path As New Drawing2D.GraphicsPath
+                    trkht = ht
+                    trksg = trkht / 6 'trunk segment lengths to work with - in feet
+                    '  trksg = pixelheight(trunkseg, distance)
+                    For n = 1 To 2
+                        botwidth = pixelheight(bottomwidth, distance) / n
+                        twidth = botwidth / 8
+                        trunkLx(0) = basex + wd / 2
+                        trunkLy(0) = basey
+                        trunkRx(0) = basex + wd / 2 + botwidth
+                        trunkRy(0) = basey
+
+
+                        For i = 1 To 6
+                            botwidth -= twidth
+                            trunkLx(i) = (trunkLx(i - 1) + randsign() * yrand(botwidth))
+                            trunkLy(i) = (trunkLy(i - 1) - randh(trksg / 2, trksg))
+                            trunkRx(i) = (trunkLx(i) + botwidth)
+                            '  If trunkRx(i) - trunkLx(i) < 1 Then trunkRx(i) += 1
+                            trunkRy(i) = trunkLy(i)
+                        Next
+
+                        Dim point12 As New Point(trunkLx(0), trunkLy(0))
+                        Dim point13 As New Point(trunkLx(1), trunkLy(1))
+                        Dim point14 As New Point(trunkLx(2), trunkLy(2))
+                        Dim point15 As New Point(trunkLx(3), trunkLy(3))
+                        Dim point16 As New Point(trunkLx(4), trunkLy(4))
+                        Dim point17 As New Point(trunkLx(5), trunkLy(5))
+                        Dim point18 As New Point(trunkLx(6), trunkLy(6))
+                        Dim point19 As New Point(trunkRx(6), trunkRy(6))
+                        Dim point20 As New Point(trunkRx(5), trunkRy(5))
+                        Dim point21 As New Point(trunkRx(4), trunkRy(4))
+                        Dim point22 As New Point(trunkRx(3), trunkRy(3))
+                        Dim point23 As New Point(trunkRx(2), trunkRy(2))
+                        Dim point24 As New Point(trunkRx(1), trunkRy(1))
+                        Dim point25 As New Point(trunkRx(0), trunkRy(0))
+
+                        Dim trunkpoints As Point() = {point12, point13, _
+                            point14, point15, point16, point17, point18, point19, point20, point21, _
+                            point22, point23, point24, point25}
+
+                        trunk_path.AddCurve(trunkpoints, 0.3)
+                        g.SetClip(trunk_path)
+                        colorblend(trunk_path.GetBounds.X, trunk_path.GetBounds.Y, _
+                        trunk_path.GetBounds.Width, trunk_path.GetBounds.Height, "trunk", 0)
+                        g.ResetClip()
+                        If Settings.Outlines = "true" Then g.DrawPath(outlinepen, trunk_path)
+
+placeleaveslast:        g.SetClip(decid)
+                        colorblend(decid.GetBounds.X, decid.GetBounds.Y, decid.GetBounds.Width, _
+                               decid.GetBounds.Height, "deciduous", 0)
+                        g.ResetClip()
+                        If Settings.Outlines = "true" Then g.DrawPath(outlinepen, decid)
+placeflowersintree:
+                        If yrand(10) > 8 Then
+                            g.SetClip(decid)
+                            Dim f, color1, color2, beginx, beginy, xwidth, yheight, newx, newy, newwidth, newheight As Integer
+                            Dim flower
+                            beginx = decid.GetBounds.X
+                            beginy = decid.GetBounds.Y
+                            xwidth = decid.GetBounds.Width
+                            yheight = decid.GetBounds.Height
+                            Dim area As New Rectangle(beginx, beginy, xwidth, yheight)
+
+                            For f = 1 To 400
+                                newx = beginx + yrand(xwidth)
+                                newy = beginy + yrand(yheight)
+                                newwidth = randh(3, 4)
+                                newheight = randh(3, 4)
+
+                                flower = New Rectangle(newx, newy, newwidth, newheight)
+                                If f = 1 Then color1 = yrand(14) Else color1 = color2
+                                Dim paintbrush As New SolidBrush(Color.Black)
+                                paintbrush.Color = ModCMBcolors.getCMBcolor(cmbseason, 0, color1)
+                                g.FillEllipse(paintbrush, flower)
+                                If f = 1 Then color2 = color1
+
+
+
+
+                            Next
+
+                            g.ResetClip()
+                            If Settings.Outlines = "true" Then g.DrawPath(outlinepen, decid)
+
+                        End If
+
+
+
+                    Next
+                End If
+            Next
+
         Next
-        Dim point0 As New Point(foliage_x(0), foliage_y(0))
-        Dim point1 As New Point(foliage_x(1), foliage_y(1))
-        Dim point2 As New Point(foliage_x(2), foliage_y(2))
-        Dim point3 As New Point(foliage_x(3), foliage_y(3))
-        Dim point4 As New Point(foliage_x(4), foliage_y(4))
-        Dim point5 As New Point(foliage_x(5), foliage_y(5))
-        Dim point6 As New Point(foliage_x(6), foliage_y(6))
-        Dim point7 As New Point(foliage_x(7), foliage_y(7))
-        Dim point8 As New Point(foliage_x(8), foliage_y(8))
-        Dim point9 As New Point(foliage_x(9), foliage_y(9))
-        Dim point10 As New Point(foliage_x(7), y + ht * 2)
-        Dim point11 As New Point(x + w / 2, y + randh(2 * ht, h))
-        Dim point12 As New Point(x, ht * 2)
-
-
-
-        Dim leaves As Point() = {point0, point1, point2, point3, point4, point5, point6, _
-       point7, point8, point9, point10, point11, point12}
-        g.FillClosedCurve(Brushes.LightGreen, leaves, 0.2)
-        ' g.DrawLines(Pens.Black, leaves)
-
 
     End Sub
 
@@ -1426,65 +2842,101 @@ nonCMB:
 
         Next i
         Dim subject As String = "logo"
-        doflatcolor(logo_path.GetBounds.X, logo_path.GetBounds.Y, logo_path.GetBounds.Width, logo_path.GetBounds.Height, 2, subject)
+        doflathousecolor(logo_path.GetBounds.X, logo_path.GetBounds.Y, logo_path.GetBounds.Width, logo_path.GetBounds.Height, 2, subject)
 
     End Sub
 
-    Private Sub makeellipsetrees()
-        Dim pntx, pnty, branch_angle As Single
-        Dim path As New Drawing2D.GraphicsPath
+    Private Sub newtreetrunks(ByVal basex, ByVal basey, ByVal botwidth, ByVal p_hgt)
+        'Dim hgt, wid, topx As Integer
 
-        For i As Integer = 0 To 10
-            Dim j As Integer
-            Dim height As Integer = 200
-            Dim startingx As Integer = 200 + i * 35
-            Dim startingy As Integer = 200
-            Dim startx As Integer = startingx
-            Dim starty As Integer = startingy
-            Dim width As Integer = 8
+        ' topx = basex
+        'distance = 100
+        'basex = 300 'randh(200, 500)
+        'basey = 400
+        'wid = 25 'normal width of whole tree in feet
+        'hgt = 70 'normal height of total tree leaf section in feet
+        'p_wid = pixelheight(wid, distance)
+        'p_hgt = pixelheight(hgt, distance)
 
-            pntx = startingx + yrand(width + 20)
-            pnty = startingy + yrand(height / 3)
-            Dim pt0 As New Point(pntx, pnty)
-            Dim pt1 As New Point(pntx + yrand(30), pnty + yrand(30))
-            Dim pt2 As New Point(pntx + randh(10, 40), pnty + randh(10, 40))
-            Dim gap As Point() = {pt0, pt1, pt2}
-            Dim brush As New SolidBrush(Color.Empty)
-            ' brush.Color = findcolor(2)
-            ''g.SetClip(path, Drawing2D.CombineMode.Exclude)
+        Dim botwidth_mem, trksg, twidth, trkht As Single
+        Dim trunkLx(7), trunkLy(7), trunkRx(7), trunkRy(7)
+        'bottomwidth = 2   '   in feet
+        'botwidth = pixelheight(bottomwidth, distance)
+        trkht = p_hgt
+        trksg = trkht / 6 'trunk segment lengths to work with - 
+        '  trksg = pixelheight(trunkseg, distance)
+        botwidth_mem = botwidth 'set up memory of width
+        Dim trunk_path As New Drawing2D.GraphicsPath
+        For n As Integer = 1 To 3
+            botwidth = botwidth_mem  'set it back to original
+            twidth = botwidth / 7
+            trunkLx(0) = basex
+            trunkLy(0) = basey
+            trunkRx(0) = basex + botwidth
+            trunkRy(0) = basey
 
-            ' g.FillPath(brush, path)
+            If n = 1 Then  'for left leaning tree
+                For i = 1 To 7
+                    botwidth -= twidth ' each segment upward loses a seventh of trump diameter
+                    trunkLx(i) = trunkLx(i - 1) - twidth * randh(-1, 7)
+                    trunkLy(i) = (trunkLy(i - 1) - randh(trksg / 2, trksg))
+                    trunkRx(i) = (trunkLx(i) + botwidth)
+                    trunkRy(i) = trunkLy(i)
+                Next
+            End If
+            If n = 2 Then  'for right leaning tree
+                For i = 1 To 6
+                    botwidth -= twidth
+                    trunkLx(i) = trunkLx(i - 1) + twidth * randh(-1, 5)
+                    trunkLy(i) = (trunkLy(i - 1) - randh(trksg / 2, trksg))
+                    trunkRx(i) = (trunkLx(i) + botwidth)
+                    trunkRy(i) = trunkLy(i)
+                Next
+            End If
+            If n = 3 Then 'for center tree
+                For i = 1 To 6
+                    botwidth -= twidth : If i = 7 Then botwidth = 2
+                    trunkLx(i) = (trunkLx(i - 1) + twidth * (randh(-1, 1)))
+                    trunkLy(i) = (trunkLy(i - 1) - randh(trksg / 2, trksg))
+                    trunkRx(i) = (trunkLx(i) + botwidth)
+                    trunkRy(i) = trunkLy(i)
+                Next
+            End If
 
-            For j = 0 To 3
-                Dim rect As New Rectangle(startingx, startingy, width, -height)
-                Dim brush1 As New SolidBrush(Color.Empty)
-                ''   brush.Color = findcolor(2)
-                'g.FillEllipse(brush, rect)
-                startingx -= 10
+            Dim point12 As New Point(trunkLx(0), trunkLy(0))
+            Dim point13 As New Point(trunkLx(1), trunkLy(1))
+            Dim point14 As New Point(trunkLx(2), trunkLy(2))
+            Dim point15 As New Point(trunkLx(3), trunkLy(3))
+            Dim point16 As New Point(trunkLx(4), trunkLy(4))
+            Dim point17 As New Point(trunkLx(5), trunkLy(5))
+            Dim point18 As New Point(trunkLx(6), trunkLy(6))
+            Dim point19 As New Point(trunkRx(6), trunkRy(6))
+            Dim point20 As New Point(trunkRx(5), trunkRy(5))
+            Dim point21 As New Point(trunkRx(4), trunkRy(4))
+            Dim point22 As New Point(trunkRx(3), trunkRy(3))
+            Dim point23 As New Point(trunkRx(2), trunkRy(2))
+            Dim point24 As New Point(trunkRx(1), trunkRy(1))
+            Dim point25 As New Point(trunkRx(0), trunkRy(0))
 
+            Dim trunkpoints As Point() = {point12, point13, _
+                point14, point15, point16, point17, point18, point19, point20, point21, _
+                point22, point23, point24, point25}
+            trunk_path = New Drawing2D.GraphicsPath
+            trunk_path.AddCurve(trunkpoints, 0.3)
+            ' g.FillPath(Brushes.Black, trunk_path)
+            g.SetClip(trunk_path)
 
-                branch_angle = randh(-10, 10)
-                path.AddEllipse(rect)
-                Rotate(startx + startx / 2, starty + height, branch_angle)
-                'Rotate(xbegin1 + xwidth1 / 2, ybegin1 + yheight1 / 2, branch_angle)
-                ' g.FillPie(brush1, rect, 100, 180)
-                ' colorblend(startingx, startingy, width, height, 5, 2)
+            colorblend(trunk_path.GetBounds.X, trunk_path.GetBounds.Y, _
+            trunk_path.GetBounds.Width, trunk_path.GetBounds.Height, "trunk", 0)
 
-                RotateBack(startx + startx / 2, starty + height, branch_angle)
-                ' g.FillPolygon(brush, gap)
-
-                width = randh(20, 60)
-                ' width = width + randh(10, 25)
-                height = height * (0.9)
-            Next
+            If Settings.Outlines = "true" Then g.DrawPath(outlinepen, trunk_path)
+            g.ResetClip()
         Next
-
-
 
     End Sub
     Private Sub makelake()
         '' -------------------------------------------------LINEAR COLOR GRADIENTS
-        If Settings.Scheme > 9 Then
+        If FormSettings.scheme > 9 Then
             Dim rect5 As New Rectangle(50, 30, 200, 200) ' a cerulean blue
             Dim lBrush As New Drawing2D.LinearGradientBrush(rect5, Color.FromArgb(230, _
            yrand(255), yrand(255), yrand(255)), _
@@ -1493,28 +2945,182 @@ nonCMB:
             g.FillRectangle(lBrush, rect5)
         End If
     End Sub
-    Private Sub makemiddleground()
-        'MIDGROUND:
-        '   road
-        '   river,or creek, 
-        '   Hill arc orientation
-        '   fields
-        '   cliffs, tree areas
+    Private Sub makeriveraswinding2()
+        Dim a, b, sparkley1, sparkley2, sparklex1, sparklex2, rx, strleftx(20), strrighty(20), strrightx(20), strlefty(20), _
+                     streamx(4), startx(4), starty(4), riverwidth, streamy(4), diststep As Integer
+        Dim rbeachx(20), rbeachy(20), lbeachx(20), lbeachy(20)
+        Dim sidesway, y_drop, y_step As Single
+        Dim river_path As New Drawing2D.GraphicsPath
+        Dim riverbed_path As New Drawing2D.GraphicsPath
 
-        'STRUCTURES
-        '   fences, barns, posts, flowered areas, stone walls
-        'NEAR MIDGROUND
-        '   stream details - turbulence, rocks, reflections, curvature, sweep
-        '   waterfall - size, top, bottom 
-        '       walls and rockwork at sides, bottom
-        '   trees, deciduous and pine
-        '   structures
+        riverwidth = randh(15, 30) 'randh(80, 200) 'in feet
+        Dim begdistance As Integer = 300 'randh(5280, 11000) 'in feet, between one and two miles away
+        distance = begdistance
+        diststep = (begdistance - 20) / 20 '90 is distance to river at bottom of screen
+
+        Dim beachkey As Integer = riverwidth / 8 ' in feet
+        Dim p_riverwidth As Integer = pixelheight(riverwidth, begdistance)
+        Dim p_beach As Integer = pixelheight(beachkey, begdistance)
+        oceanpoint = 0
+        'total number of divisions below horizon = 6
+        ' divHeight = (Image.Height - horizon) / 6
+        'determine approximate no. divisions left below beginning point of stream
+        startx(3) = randh(Image.Width * 0.2, Image.Width * 0.8)
+        starty(3) = horizon + randh(2, 20)
+        Dim ystart As Single = starty(3)
+        y_step = (Image.Height + 160 - ystart) / 20
+
+        'restore beach color if ocean not wanted
+        If oceanpoint < 1 Then
+            Dim subject As String = "beach"
+            colorblend(0, ystart, Image.Width, Image.Height, subject, 0)
+        End If
+
+        startx(4) = startx(3) - p_riverwidth
+        starty(4) = starty(3)
+
+        For j As Integer = 20 To 1 Step -1
+
+
+            distance -= diststep
+            p_riverwidth = pixelheight(riverwidth, distance)
+            y_drop = pixelheight((Image.Height + 100 - starty(4)) / j, distance)
+            ' y_drop = pixelheight(y_step, distance)
+            rx = yrand(p_riverwidth * 0.75)
+            If yrand(10) > 6 Then
+                sidesway = -rx
+            Else : sidesway = rx
+            End If
+
+
+            streamx(1) = startx(4)
+            streamy(1) = starty(4)
+            streamx(2) = startx(3)
+            streamy(2) = starty(3)
+            streamx(3) = streamx(2) + sidesway
+            streamy(3) = streamy(2) + y_drop
+            streamx(4) = streamx(3) - p_riverwidth
+            If streamx(4) = streamx(3) Then streamx(4) -= 1
+            streamy(4) = streamy(3)
+            i += 1
+
+            For n As Integer = 3 To 4
+                startx(n) = streamx(n) : starty(n) = streamy(n)
+            Next n
+
+            strrightx(j) = streamx(3)
+            strrighty(j) = streamy(3)
+            strleftx(j) = streamx(4)
+            strlefty(j) = streamy(4)
+
+            ' add beach points into memory
+            p_beach = pixelheight(beachkey, distance)
+            rbeachx(j) = strrightx(j) + p_beach
+            rbeachy(j) = streamy(3)
+            lbeachx(j) = strleftx(j) - p_beach
+            lbeachy(j) = streamy(4)
+
+        Next j
+
+        For riverwidth2 As Integer = 1 To 2
+            'follow river edge down on left side then up on right side for best computer line curvature
+            Dim point0 As New Point(strleftx(0), strlefty(0))
+            Dim point1 As New Point(strleftx(1), strlefty(1))
+            Dim point2 As New Point(strleftx(2), strlefty(2))
+            Dim point3 As New Point(strleftx(3), strlefty(3))
+            Dim point4 As New Point(strleftx(4), strlefty(4))
+            Dim point5 As New Point(strleftx(5), strlefty(5))
+            Dim point6 As New Point(strleftx(6), strlefty(6))
+            Dim point7 As New Point(strleftx(7), strlefty(7))
+            Dim point8 As New Point(strleftx(8), strlefty(8))
+            Dim point9 As New Point(strleftx(9), strlefty(9))
+            Dim point10 As New Point(strleftx(10), strlefty(10))
+            Dim point11 As New Point(strleftx(11), strlefty(11))
+            Dim point12 As New Point(strleftx(12), strlefty(12))
+            Dim point13 As New Point(strleftx(13), strlefty(13))
+            Dim point14 As New Point(strleftx(14), strlefty(14))
+            Dim point15 As New Point(strleftx(15), strlefty(15))
+            Dim point16 As New Point(strleftx(16), strlefty(16))
+            Dim point17 As New Point(strleftx(17), strlefty(17))
+            Dim point18 As New Point(strleftx(18), strlefty(18))
+            Dim point19 As New Point(strleftx(19), strlefty(19))
+            Dim point20 As New Point(strleftx(20), strlefty(20))
+
+            Dim point21 As New Point(strrightx(0), strrighty(0))
+            Dim point22 As New Point(strrightx(1), strrighty(1))
+            Dim point23 As New Point(strrightx(2), strrighty(2))
+            Dim point24 As New Point(strrightx(3), strrighty(3))
+            Dim point25 As New Point(strrightx(4), strrighty(4))
+            Dim point26 As New Point(strrightx(5), strrighty(5))
+            Dim point27 As New Point(strrightx(6), strrighty(6))
+            Dim point28 As New Point(strrightx(7), strrighty(7))
+            Dim point29 As New Point(strrightx(8), strrighty(8))
+            Dim point30 As New Point(strrightx(9), strrighty(9))
+            Dim point31 As New Point(strrightx(10), strrighty(10))
+            Dim point32 As New Point(strrightx(11), strrighty(11))
+            Dim point33 As New Point(strrightx(12), strrighty(12))
+            Dim point34 As New Point(strrightx(13), strrighty(13))
+            Dim point35 As New Point(strrightx(14), strrighty(14))
+            Dim point36 As New Point(strrightx(15), strrighty(15))
+            Dim point37 As New Point(strrightx(16), strrighty(16))
+            Dim point38 As New Point(strrightx(17), strrighty(17))
+            Dim point39 As New Point(strrightx(18), strrighty(18))
+            Dim point40 As New Point(strrightx(19), strrighty(19))
+            Dim point41 As New Point(strrightx(20), strrighty(20))
+
+            Dim rivercurvePoints As Point() = {point20, point19, point18, point17, point16, _
+            point15, point14, point13, point12, point11, point10, point9, point8, _
+            point7, point6, point5, point4, point3, point2, point1, point0, _
+            point21, point22, point23, point24, point25, point26, point27, point28, _
+            point29, point30, point31, point32, point33, point34, point35, point36, _
+            point37, point38, point39, point40, point41}
+            river_path = New Drawing2D.GraphicsPath
+            ' beach_path
+            river_path.AddCurve(rivercurvePoints, 0.3)       'river_path includes 42 input points
+            If riverwidth2 = 1 Then
+                riverbed_path = New Drawing2D.GraphicsPath
+                riverbed_path.AddCurve(rivercurvePoints)
+                g.SetClip(river_path)
+
+                colorblend(0, ystart, Image.Width, Image.Height - ystart, "river", 0)
+                g.ResetClip()
+
+                If Settings.Outlines = True Then
+                    stainedglasspen.Alignment = Drawing2D.PenAlignment.Outset
+                    g.DrawPath(stainedglasspen, river_path)
+                End If
+
+                ' set up for adding the beach or treeline alongside the stream, by replacing points
+                For n As Integer = 0 To 20
+                    strrightx(n) = rbeachx(n)
+                    strleftx(n) = lbeachx(n)
+                Next
+            Else
+                '   set stream up for mountainsides extending from either side
+                streampts = river_path.PathPoints() 'streampts includes 123 output curve points
+                riverpts = river_path.PathPoints()  'both are used
+
+            End If
+        Next riverwidth2
+
+        '               make sparkles on water
+        g.SetClip(riverbed_path)
+        head = streampts(0).y
+        Dim pen As New Pen(Color.White, 1) 'needs to be sky color
+        For p As Integer = 1 To 5
+            For r As Integer = 1 To 70
+                sparklex1 = randh(30, 500)
+                a = head : b = head + 20 * p
+                sparkley1 = randh(a, b)
+                sparklex2 = sparklex1 + randh(2, 5)
+                sparkley2 = sparkley1
+                g.DrawLine(pen, sparklex1, sparkley1, sparklex2, sparkley2)
+            Next
+        Next p
+        g.ResetClip()
+        g.SetClip(river_path, Drawing2D.CombineMode.Exclude)
 
     End Sub
-    Private Sub makeriver__________()
-
-    End Sub
-
     Private Sub makeriveraswinding()
         Dim a, b, sparkley1, sparkley2, sparklex1, sparklex2, rx, strleftx(20), strrighty(20), strrightx(20), strlefty(20), _
               streamx(4), startx(4), starty(4), riverwidth, streamy(4), divHeight As Integer
@@ -1529,16 +3135,15 @@ nonCMB:
         'total number of divisions below horizon = 6
         divHeight = (Image.Height - horizon) / 6
         'determine approximate no. divisions left below beginning point of stream
-        startx(3) = randh(Image.Width * 0.4, Image.Width * 0.7)
+        startx(3) = randh(Image.Width * 0.2, Image.Width * 0.8)
         starty(3) = horizon + randh(2, 20)
-        'starty(3) = horizon + randh(35, 60)
 
         Dim ystart As Single = starty(3)
 
         'restore beach color if ocean not wanted
         If oceanpoint < 1 Then
-            Dim subject As String = "beach" : Dim type As String = "rect"
-            colorblend(0, ystart, Image.Width, Image.Height, subject, type)
+            Dim subject As String = "beach"
+            colorblend(0, ystart, Image.Width, Image.Height, subject, 0)
         End If
 
         level = 7 - ((starty(3) - horizon + 1) / (Image.Height - horizon))
@@ -1554,7 +3159,11 @@ nonCMB:
             h = ((7 - level) * 0.6) ^ 2
             addonsw = riverwidth * h
             rx = yrand(80)
-            sidesway = randsign() * rx
+            If yrand(10) > 7 Then
+                sidesway = -rx
+            Else : sidesway = rx
+            End If
+
 
             streamx(1) = startx(4)
             streamy(1) = starty(4)
@@ -1643,10 +3252,8 @@ nonCMB:
                 riverbed_path = New Drawing2D.GraphicsPath
                 riverbed_path.AddCurve(rivercurvePoints)
                 g.SetClip(river_path)
-                Settings.subject = "river"
-                Dim subject As String = Settings.subject
-                Dim type As String = "rect"
-                colorblend(0, ystart, Image.Width, Image.Height - ystart, subject, type)
+
+                colorblend(0, ystart, Image.Width, Image.Height - ystart, "river", 0)
                 g.ResetClip()
 
                 If Settings.Outlines = True Then
@@ -1773,7 +3380,7 @@ processpoints:
                 ' starting points for the intersecting mountain shape
                 initialx(0) = streampts(levelstartx).x
                 initialy(0) = streampts(levelstartx).y
-                If Settings.Prairie = True Then
+                If Settings.Flat = True Then
                     initialx(1) = streampts(levelstartx).x - (q * (xincr - randsign() * randh(2, 14)))
                     initialy(1) = initialy(0) - 20 * levelstartx / 10
                     low = 2
@@ -1836,8 +3443,8 @@ processpoints:
                 'Else
                 hill_path.AddCurve(curvepoints3, 0.3F)
 
-
-                Dim hx, hy As Integer       'place trees on crests of mountains/hills
+hilltrees:
+                Dim hx, hy As Integer       'place trees on crests of mountains/hills before adding hills
                 Dim hillpath
                 hillpath = hill_path.PathPoints
                 Dim width, height, starty As Integer
@@ -1866,8 +3473,8 @@ processpoints:
                             Dim ellipse_path As New Drawing2D.GraphicsPath
                             ellipse_path.AddEllipse(hx, hy, width, -height)
                             g.SetClip(ellipse_path)
-                            Dim subject1 As String = "hilltrees" : Dim type1 As String = "ellipse"
-                            colorblend(hx, hy, width, -height, subject1, type1)
+                            Dim subject1 As String = "hilltrees"
+                            colorblend(hx, hy, width, -height, subject1, 0)
 
                             'Dim tree_brush As New SolidBrush(Color.FromArgb(255, beep.R, beep.G, beep.B))
                             'g.FillEllipse(tree_brush, hilltrees_rect)
@@ -1879,14 +3486,14 @@ loop1:                  e += 1
 
                 acchill_path.AddCurve(curvepoints3)     'accumulates the hillshapes
                 g.SetClip(hill_path)
-                Dim subject As String = "river_mountains" : Dim type As String = "rect"
+                Dim subject As String = "river_mountains"
                 colorblend(hill_path.GetBounds.X, hill_path.GetBounds.Y, hill_path.GetBounds.Width, _
-                hill_path.GetBounds.Height, subject, type)
+                hill_path.GetBounds.Height, subject, 0)
 
                 Dim a As Integer
                 If Settings.Winter = True Then a = 240 Else a = 100
                 Dim haze_brush As New SolidBrush(Color.FromArgb(a, 240, 240, 255))
-                If Settings.Mountains = False Then
+                If Settings.Mountainous = False Then
                     g.FillPath(haze_brush, acchill_path)
                 End If
 
@@ -1904,10 +3511,10 @@ loop1:                  e += 1
         'makerivertrees()
     End Sub
 
-    Private Sub Rotate(ByVal x As Integer, ByVal y As Integer, ByVal a As Single)
-        g.TranslateTransform(x, y)
+    Private Sub Rotate(ByVal axisx As Integer, ByVal axisy As Integer, ByVal a As Single)
+        g.TranslateTransform(axisx, axisy)
         g.RotateTransform(a)
-        g.TranslateTransform(-x, -y)
+        g.TranslateTransform(-axisx, -axisy)
     End Sub
 
     Private Sub RotateBack(ByVal x As Integer, ByVal y As Integer, ByVal a As Single)
@@ -1921,8 +3528,12 @@ loop1:                  e += 1
         Dim h, level, xbegin1, ybegin1, ybase, ybase1, ybase2, xwidth1, yheight1 As Single
         Dim beg, en, st, q, ht As Integer
         Dim j As Integer
-        'ht = randh(160 * 3, 270 * 3)     'basic tree height
-        ht = randh(100, 200) * 3
+        'ht = randh(160 * 3, 270 * 3) 
+
+        Dim treehtfactor As Integer ' height of trees, determining how close they seem to be
+        treehtfactor = randh(3, 9)
+        'If Settings.Stream = True Then treehtfactor = randh(60, 520)
+        ht = randh(70, 200) * treehtfactor
         Dim trees_path As New Drawing2D.GraphicsPath
 
         level = (riverpts(0).y - horizon + 1) / (Image.Height - horizon)
@@ -1941,14 +3552,14 @@ loop1:                  e += 1
 
             level = (ybase - horizon + 1) / (Image.Height - horizon)
             h = (level * 0.6) ^ 2
-
+            '    h = level ^ 2 'option
 size:
             yheight1 = (ht + yrand(79)) * h
             Dim Con As Single
-            Con = (randh(20, 40) / 10)
+            Con = (randh(16, 24) / 10)
             xwidth1 = yheight1 / Con
             If xwidth1 < 3 Then GoTo loops
-            If yheight1 > 360 Then Exit Do
+            If yheight1 > 540 Then Exit Do
 
             ybegin1 = ybase - yheight1 - 5
 
@@ -1957,53 +3568,16 @@ size:
                     xbegin1 = riverpts(j - st).x + (ybase - riverpts(j - st).y) _
                                          * (riverpts(j).x - riverpts(j - st).x) _
                                          / (riverpts(j).y - riverpts(j - st).y)
-                    xbegin1 = xbegin1 + q * xwidth1 + q * randh(0, 10)
+                    xbegin1 = xbegin1 + q * xwidth1 + q * randh(0, 10) - xwidth1 / 2
                     Exit For
                 End If
             Next
-            If yrand(10) > 0 Then
+            If yrand(10) > 3 Then  'place trees
                 rivertrees(xbegin1, ybegin1, xwidth1, yheight1)
-            Else
-
-                Dim skyhole, ra, rb As Integer
-                Dim rect As New Rectangle(xbegin1, ybegin1, xwidth1, yheight1)
-                If Settings.Outlines = True And xwidth1 < 6 Then GoTo loops
-                skyhole = randh(1, 6)
-                Select Case skyhole
-                    Case Is = 1     'left gap
-                        ra = 230 : rb = 340
-                    Case Is = 2     'right gap
-                        ra = 335 : rb = 340
-                    Case Is = 3     'bottom out
-                        ra = 135 : rb = 270
-                    Case Is = 4     'top split
-                        ra = 280 : rb = 350
-                    Case Is >= 5    'no change
-                        ra = 280 : rb = 360
-                End Select
-                'treeangle = randh(-14, 14)
-
-                '  This will rotate the following objects by "treeangle" degrees.
-                '  It will rotate the objects around the x and y values 
-                '  xbegin1 + xwidth1/2, ybegin1 + yheight1 rotates the object around the bottom-middle of the object.
-                '  xbegin1 + xwidth1/2, ybegin1 + yheight1/2 rotates the object around the middle-middle of the object.
-
-                'Rotate(xbegin1 + xwidth1 / 2, ybegin1 + yheight1, treeangle)
-                Dim brush1 As New SolidBrush(Color.Empty)
-                'brush1.Color = findcolor(2)    'tone will determine the tonal nature of the color
-                g.FillPie(brush1, rect, ra, rb)
-                g.SetClip(rect)
-                'Dim subject As String = "rivertrees" : Dim type As String = "ellipse"
-                'colorblend(xbegin1, ybegin1, xwidth1, yheight1, subject, type)
-                g.ResetClip()
-
-                If Settings.Outlines = True Then
-                    g.DrawPie(stainedglasspen, rect, ra, rb)
-                    g.DrawEllipse(stainedglasspen, rect)
-                End If
-                ' RotateBack(xbegin1 + xwidth1 / 2, ybegin1 + yheight1, treeangle)
             End If
-            treetrunks(xbegin1, xwidth1, ybegin1, yheight1, h)
+            If yrand(10) > 1 Then 'place trunks, sometimes alone
+                treetrunks(xbegin1, xwidth1, ybegin1, yheight1, h)
+            End If
 
 loops:      If ybase = ybase1 Then
                 ybase1 = ybase1 + (randh(0, 4) ^ 4) * h
@@ -2014,18 +3588,22 @@ loops:      If ybase = ybase1 Then
 
     End Sub
     Private Sub treetrunks(ByVal xbegin1, ByVal xwidth1, ByVal ybegin1, ByVal yheight1, ByVal h)
-
+        'for rivertrees
         Dim brush As New SolidBrush(Color.DarkGray)
-        Dim xtrunkbottom1, xtrunkwidth, ytrunkbottom1, ytrunkbottom2, xtrunktop, ytrunktop As Single
+        Dim xtrunkbottom1, xtrunkwidth, ytrunkbottom1, ytrunkbottom2, xtrunktop, ytrunktop, botwidth As Single
         For m As Integer = 1 To 2 ' do two trunks per tree
             xtrunkbottom1 = xbegin1 + xwidth1 / 2
             ytrunkbottom1 = ybegin1 - 3 + yheight1 + 60 * h
-            xtrunkwidth = xtrunkbottom1 + 15 * h
+            xtrunkwidth = xtrunkbottom1 + 20 * h
             ytrunkbottom2 = ytrunkbottom1
-
-            xtrunktop = xtrunkbottom1 + randsign() * yrand(6)
+            botwidth = (xtrunkwidth - xtrunkbottom1) * 1.5
+            If botwidth < 1.0 Then Return
+            xtrunktop = xtrunkbottom1 + randsign() * (yrand(6) * h)
             ytrunktop = randh(ytrunkbottom1 - yheight1 * 0.8, ytrunkbottom1 - yheight1 * 1.2)
-
+            If Settings.River = True Then
+                newtreetrunks(xtrunkbottom1, ytrunkbottom1, botwidth, ytrunkbottom1 - ytrunktop * 0.9)
+                Return
+            End If
             Dim point21 As New Point(xtrunkbottom1, ytrunkbottom1)
             Dim point22 As New Point(xtrunkwidth, ytrunkbottom2)
             Dim point23 As New Point(xtrunktop, ytrunktop)
@@ -2038,32 +3616,58 @@ loops:      If ybase = ybase1 Then
             If trunk_path.GetBounds.Width < 2 Or trunk_path.getbounds.height < 1 Then Return
             g.SetClip(trunk_path)
 
-            If yrand(100) > 80 Then g.FillPath(Brushes.Black, trunk_path) Else g.FillPath(Brushes.DarkGray, trunk_path)
-            'colorblend(trunk_path.GetBounds.X, trunk_path.GetBounds.Y, _
-            'trunk_path.GetBounds.Width, trunk_path.GetBounds.Height, 4, 1)
+            'If yrand(100) > 3 Then g.FillPath(Brushes.Black, trunk_path) Else g.FillPath(Brushes.DarkGray, trunk_path)
+            colorblend(trunk_path.GetBounds.X, trunk_path.GetBounds.Y, _
+            trunk_path.GetBounds.Width, trunk_path.GetBounds.Height, "trunk", 1)
             g.ResetClip()
             If Settings.Outlines = True Then g.DrawPath(Pens.Black, trunk_path)
-            Return
 
-
-
-            '' PUT BLACK BLOTCHES ON TREE
-            'Dim pen1 As New Pen(Color.Black, 1)
-            'For r As Integer = 1 To 5
-            '    Dim x, y, x1, y1 As Integer
-            '    x = randh(trunk_path.getbounds.x - 4, trunk_path.getbounds.width + 4)
-            '    y = randh(trunk_path.getbounds.y, trunk_path.getbounds.y - trunk_path.getbounds.height)
-            '    x1 = x + randh(1, 2)
-            '    y1 = y
-            '    g.DrawLine(pen1, x, y, x1, y1)
-            'Next
-            '' If Settings.Outlines = True Then g.DrawPath(stainedglasspen, trunk_path)
         Next
         g.ResetClip()
 
-
     End Sub
     Private Sub makerivertreebranch2()
+        'unused, outdated stuff
+        'do the ellipse trees
+
+        'Dim skyhole, ra, rb As Integer
+        'Dim rect As New Rectangle(xbegin1, ybegin1, xwidth1, yheight1)
+        'If Settings.Outlines = True And xwidth1 < 6 Then GoTo loops
+        'skyhole = randh(1, 6)
+        'Select Case skyhole
+        '    Case Is = 1     'left gap
+        '        ra = 230 : rb = 340
+        '    Case Is = 2     'right gap
+        '        ra = 335 : rb = 340
+        '    Case Is = 3     'bottom out
+        '        ra = 135 : rb = 270
+        '    Case Is = 4     'top split
+        '        ra = 280 : rb = 350
+        '    Case Is >= 5    'no change
+        '        ra = 280 : rb = 360
+        'End Select
+        ''treeangle = randh(-14, 14)
+
+        '  This will rotate the following objects by "treeangle" degrees.
+        '  It will rotate the objects around the x and y values 
+        '  xbegin1 + xwidth1/2, ybegin1 + yheight1 rotates the object around the bottom-middle of the object.
+        '  xbegin1 + xwidth1/2, ybegin1 + yheight1/2 rotates the object around the middle-middle of the object.
+
+        'Rotate(xbegin1 + xwidth1 / 2, ybegin1 + yheight1, treeangle)
+        'Dim brush1 As New SolidBrush(Color.Empty)
+        ''brush1.Color = findcolor(2)    'tone will determine the tonal nature of the color
+        'g.FillPie(brush1, rect, ra, rb)
+        'g.SetClip(rect)
+        ''Dim subject As String = "rivertrees" : Dim type As String = "ellipse"
+        ''colorblend(xbegin1, ybegin1, xwidth1, yheight1, subject, type)
+        'g.ResetClip()
+
+        'If Settings.Outlines = True Then
+        '    g.DrawPie(stainedglasspen, rect, ra, rb)
+        '    g.DrawEllipse(stainedglasspen, rect)
+        'End If
+        '' RotateBack(xbegin1 + xwidth1 / 2, ybegin1 + yheight1, treeangle)
+
         ''Place a branch or two on tree, using rotated ellipses
         ''first get proper branch size according to distance
         'Dim xbranchwidth, ybranchtop As Integer
@@ -2079,13 +3683,12 @@ loops:      If ybase = ybase1 Then
         'RotateBack(xtrunkbottom1, (ytrunkbottom1 - ytrunktop) / 2, branch_angle)
         'colorblend(xtrunkbottom1, ytrunktop, xtrunkwidth, -ybranchtop, 3, 2)
     End Sub
-    Public Function findcolor(ByVal div)
-        Dim tone As Integer = CInt(Mid(Settings.tonalcomp, div, 1)) ' number 1,2 or 3 (1=light, med, or Dark)
+    Public Function findcolor(ByVal tone) 'tonal_distance is 3 = light, 2 = mid, 1 = dark
+        tone = yrand(2)
 CMB:
-        If Settings.Scheme > 9 Then
-            Dim cmbseason As Integer = Settings.Scheme - 10  'changing from 11, 12, 13, etc
+        If FormSettings.scheme > 9 Then
+            Dim cmbseason As Integer = FormSettings.scheme - 10  'changing from 11, 12, 13, etc
             tone = tone - 1 ' to give a base of 0 (for CMB)
-            If Settings.Intensity = "Any" Then tone = c_randh(0, 2) 'by random selection
             color14 = c_randh(1, 14)       '14 colors in each CMB level
             Dim brush As New SolidBrush(Color.Empty)
             brush.Color = ModCMBcolors.getCMBcolor(cmbseason, tone, color14)
@@ -2099,24 +3702,23 @@ CMB:
 
 NonCMB:
         'intensity and tone are separate variables in NonCMB colors
-        Dim intensity As String = Settings.Intensity
-
-        If tone = 1 Then M_light = c_randh(7, 9)
-        If tone = 2 Then M_light = c_randh(4, 6)
-        If tone = 3 Then M_light = c_randh(1, 3)
+        tone = yrand(2)
+        If tone = 0 Then M_light = c_randh(7, 9)
+        If tone = 1 Then M_light = c_randh(4, 6)
+        If tone = 2 Then M_light = c_randh(1, 3)
 
         Dim colsymb, domin As Integer
-        If Settings.Scheme > 0 And Settings.Scheme < 3 Then domin = 1 Else domin = 2
-        colsymb = c_randh(0, Settings.Scheme * domin)
-        If colsymb > Settings.Scheme Then colsymb = 0 'setting dominance through weighting
-        M_color = Settings.Colours(colsymb)
+        If FormSettings.scheme > 0 And FormSettings.scheme < 3 Then domin = 1 Else domin = 2
+        colsymb = c_randh(0, FormSettings.scheme * domin)
+        If colsymb > FormSettings.scheme Then colsymb = 0 'setting dominance through weighting
+        M_color = FormSettings.colours(colsymb)
         Dim brush2 As New SolidBrush(Color.Empty)
         brush2.Color = modColors.getcolor(M_color, 1, M_light)
         Mred = brush2.Color.R : Mgreen = brush2.Color.G : Mblue = brush2.Color.B
         findcolor = brush2.Color
     End Function
 
-    Private Sub doflatcolor(ByVal x, ByVal y, ByVal len, ByVal hgt, ByVal div, ByVal subject)
+    Private Sub doflathousecolor(ByVal x, ByVal y, ByVal len, ByVal hgt, ByVal div, ByVal subject)
         Dim area As New Rectangle(x, y, len, hgt)
         Dim brush2 As New SolidBrush(Color.Empty)
 
@@ -2174,7 +3776,7 @@ NonCMB:
         End If
 
 
-        If Settings.Scheme > 9 Then
+        If FormSettings.scheme > 9 Then
             doflatCMBcolor(x, y, len, hgt, div, subject)
         Else
             doflatREGcolor(x, y, len, hgt, div, subject)
@@ -2184,7 +3786,7 @@ NonCMB:
     Private Sub setuphousecolorsCMB(ByVal type)
         Dim xtone As Integer
         Dim matchcolors As String = "333333333"
-        Dim cmbseason As Integer = Settings.Scheme - 10  'changing from 11, 12, 13, etc
+        Dim cmbseason As Integer = FormSettings.scheme - 10  'changing from 11, 12, 13, etc
         If cmbseason = 0 Then
             matchcolors = "001101 101201 002202 003002 004002 005003 005002 006107 006108 006002 004014 004006 010106 102208 011209 113203 014213 008211 004113 012203"
         ElseIf cmbseason = 1 Then
@@ -2246,11 +3848,11 @@ NonCMB:
     End Sub
     Private Sub setuphousecolorsREG(ByVal type)
         Dim colsymb, domin As Integer
-        If Settings.Scheme > 0 And Settings.Scheme < 3 Then domin = 1 Else domin = 2
-        colsymb = c_randh(0, Settings.Scheme * domin)
-        If colsymb > Settings.Scheme Then colsymb = 0 'setting dominance through weighting
+        If FormSettings.scheme > 0 And FormSettings.scheme < 3 Then domin = 1 Else domin = 2
+        colsymb = c_randh(0, FormSettings.scheme * domin)
+        If colsymb > FormSettings.scheme Then colsymb = 0 'setting dominance through weighting
 
-        M_color = Settings.Colours(colsymb)
+        M_color = FormSettings.colours(colsymb)
 
         If type = "walls" Then wallsltcolor = M_color
         If type = "roof" Then roofltcolor = M_color
@@ -2276,12 +3878,12 @@ NonCMB:
     End Sub
     Private Sub doflatCMBcolor(ByVal x, ByVal y, ByVal len, ByVal hgt, ByVal div, ByVal subject)  'div as picture division, top to bottom 1/3
         'from doflatcolor()
-        Dim sunleft = Settings.left : Dim sunright = Settings.Right : Dim sunabove = Settings.Above : Dim sunambient = Settings.Ambient
+        Dim sunleft = Settings.left : Dim sunright = Settings.Right : Dim sunabove = Settings.Above
         'Dim sunright As settings.right
         Dim area As New Rectangle(x, y, len, hgt)
-        Dim cmbseason As Integer = Settings.Scheme - 10
+        Dim cmbseason As Integer = FormSettings.scheme - 10
         'set tone by tonal composition, based on the placement of the drawn object, sent as a number 1 - 3
-        Dim tone As Integer = CInt(Mid(Settings.tonalcomp, div, 1)) ' number 1,2 or 3 (1=light, med, or Dark)
+        Dim tone As Integer = randh(1, 3) ' number 1,2 or 3 (1=light, med, or Dark)
         'with the following exceptions
         Dim brush2 As New SolidBrush(Color.Empty)
 
@@ -2390,7 +3992,7 @@ NonCMB:
     End Sub
 
     Private Sub doflatREGcolor(ByVal x, ByVal y, ByVal len, ByVal hgt, ByVal div, ByVal subject)
-        Dim sunleft = Settings.left : Dim sunright = Settings.Right : Dim sunabove = Settings.Above : Dim sunambient = Settings.Ambient
+        Dim sunleft = Settings.left : Dim sunright = Settings.Right : Dim sunabove = Settings.Above
         'intensity and tone are separate variables in NonCMB colors
         'set tone by tonal composition, based on the placement of the drawn object, sent as a number 1 - 3
         'Dim tone As Integer = CInt(Mid(Settings.tonalcomp, div, 1)) ' number 1,2 or 3 (1=light, med, or Dark)
@@ -2505,10 +4107,10 @@ NonCMB:
 
 
         Else : Dim colsymb, domin As Integer
-            If Settings.Scheme > 0 And Settings.Scheme < 3 Then domin = 1 Else domin = 2
-            colsymb = c_randh(0, Settings.Scheme * domin)
-            If colsymb > Settings.Scheme Then colsymb = 0 'setting dominance through weighting
-            M_color = Settings.Colours(colsymb) 'changed M_color
+            If FormSettings.scheme > 0 And FormSettings.scheme < 3 Then domin = 1 Else domin = 2
+            colsymb = c_randh(0, FormSettings.scheme * domin)
+            If colsymb > FormSettings.scheme Then colsymb = 0 'setting dominance through weighting
+            M_color = FormSettings.colours(colsymb) 'changed M_color
             M_light = c_randh(1, 9)
         End If
 
@@ -2517,13 +4119,13 @@ NonCMB:
         g.FillRectangle(brush2, area)
 
 colorIntensity:
-        Dim intensity As String = Settings.Intensity
+        Dim intensity As Integer = yrand(2)
         Dim grays, grayness As Integer
         Dim gray As Integer = 0
-        If intensity = "Any" Then gray = c_randh(1, 3)
-        If intensity = "High" Or intensity = "Any" Or gray = 1 Then grayness = 0
-        If intensity = "Medium" Or gray = 2 Then grayness = 180
-        If intensity = "Low" Or gray = 3 Then grayness = 200
+
+        If intensity = 0 Then grayness = 0
+        If intensity = 1 Then grayness = 180
+        If intensity = 2 Then grayness = 200
 
         grays = CInt((Mid("050088120147170190210230245", (M_light * 3 - 2), 3)))
 
@@ -2558,7 +4160,7 @@ colorIntensity:
         Dim subject As String = "bush" : Dim type As String = "rect"
         If bush_path.GetBounds.Height < 1 Or bush_path.GetBounds.Width < 1 Then g.ResetClip() : Return
         colorblend(bush_path.GetBounds.X, bush_path.GetBounds.Y, bush_path.GetBounds.Width, _
-        bush_path.GetBounds.Height, subject, type)
+        bush_path.GetBounds.Height, subject, 0)
         'g.FillPath(brushy, bush_path)
         g.ResetClip()
         If Settings.Outlines = True Then g.DrawPath(stainedglasspen, bush_path)
@@ -2566,74 +4168,84 @@ colorIntensity:
 
     End Sub
     Private Sub colorblend(ByVal beginx, ByVal beginy, ByVal xwidth, ByVal yheight, ByVal subject, ByVal type_fill)
-        If Settings.Scheme > 9 Then
-            CMBblend(beginx, beginy, xwidth, yheight, subject, type_fill)
+        If type_fill < 2 Then colormem = 0 'type_fill determines if objects in a series are to be same color
+        If FormSettings.scheme > 9 Then
+            dualCMBblend(beginx, beginy, xwidth, yheight, subject, type_fill)
         Else
             dualcolorblend(beginx, beginy, xwidth, yheight, subject, type_fill)
+            Return
         End If
     End Sub
 
-    Private Sub CMBblend(ByVal beginx, ByVal beginy, ByVal xwidth, ByVal yheight, ByVal subject, ByVal type_fill)
-        Dim color1
-        Dim darkness, colors1, cmbseason, uppera, lowera, uplight, lowlight, applysun As Integer
+    Private Sub dualCMBblend(ByVal beginx, ByVal beginy, ByVal xwidth, ByVal yheight, ByVal subject, ByVal type_fill)
+        Dim colors1 As Integer = 0
+        Dim darkness, cmbseason, lightera, darkera, uplight, lowlight, applysun As Integer
         Dim area As New Rectangle(beginx, beginy, xwidth, yheight)
-        cmbseason = Settings.Scheme - 10  'CMB color seasons from 0 to 3
-
+        cmbseason = FormSettings.scheme - 10  'CMB color seasons are from 0 to 3
+        applysun = 0
 striateclouds:
         If subject = "striate" Then
+            darkness = 0
             Dim striate_color As Integer = c_randh(1, 4)
             If cmbseason = 0 Then colors1 = CInt(Mid("04051014", striate_color * 2 - 1, 2))
             If cmbseason = 1 Then colors1 = CInt(Mid("01020308", striate_color * 2 - 1, 2))
             If cmbseason = 2 Then colors1 = CInt(Mid("02050712", striate_color * 2 - 1, 2))
             If cmbseason = 3 Then colors1 = CInt(Mid("02040507", striate_color * 2 - 1, 2))
-            darkness = 0 : uppera = 180 : lowera = 15 : uplight = 255 : lowlight = 25
-            GoTo colorit
+            lightera = 180 : uplight = 255
+            darkera = 15 : lowlight = 25
             applysun = 1
+            GoTo colorit
         End If
 
 River:
         If subject = "river" Then
             'random choice of selected colors for each season
+            darkness = 2
             Dim color_river As Integer = c_randh(1, 5)
             If cmbseason = 0 Then colors1 = CInt(Mid("0405060711", color_river * 2 - 1, 2))
             If cmbseason = 1 Then colors1 = CInt(Mid("0102030510", color_river * 2 - 1, 2))
             If cmbseason = 2 Then colors1 = CInt(Mid("0304060809", color_river * 2 - 1, 2))
             If cmbseason = 3 Then colors1 = CInt(Mid("0205061213", color_river * 2 - 1, 2))
-            darkness = 2 : uppera = 200 : lowera = 15 : uplight = 255 : lowlight = 25
+            lightera = 200 : uplight = 255
+            darkera = 200 : lowlight = 0
             GoTo colorit
         End If
-
-beach:
-        If subject = "beach" Then 'Riverbeach
+riverbeach:
+        If subject = "beach" Then
+            darkness = 1
             Dim color_beach As Integer = c_randh(1, 4)
             If cmbseason = 0 Then colors1 = CInt(Mid("01050614", color_beach * 2 - 1, 2))
             If cmbseason = 1 Then colors1 = CInt(Mid("01081011", color_beach * 2 - 1, 2))
             If cmbseason = 2 Then colors1 = CInt(Mid("01040711", color_beach * 2 - 1, 2))
             If cmbseason = 3 Then colors1 = CInt(Mid("01050608", color_beach * 2 - 1, 2))
-            darkness = 1 : uppera = 190 : lowera = 160 : uplight = 255 : lowlight = 0
+            lightera = 190 : uplight = 255
+            darkera = 160 : lowlight = 0
             GoTo colorit
         End If
 
 sea:
         If subject = "sea" Then
+            darkness = 1
             Dim color_sea As Integer = c_randh(1, 4)
             If cmbseason = 0 Then colors1 = CInt(Mid("01031014", color_sea * 2 - 1, 2))
             If cmbseason = 1 Then colors1 = CInt(Mid("02030405", color_sea * 2 - 1, 2))
             If cmbseason = 2 Then colors1 = CInt(Mid("02030606", color_sea * 2 - 1, 2))
             If cmbseason = 3 Then colors1 = CInt(Mid("01040910", color_sea * 2 - 1, 2))
-            darkness = 1 : uppera = 170 : lowera = 200 : uplight = 255 : lowlight = 0
+            lightera = 170 : uplight = 255
+            darkera = 200 : lowlight = 0
             GoTo colorit
         End If
 
 bg_mountains:
-        If subject = "bg_mountains" Then
-            color1 = 0
+        If subject = "bg_mountains" Then '      background mountains
+            darkness = 2
             Dim color_bg_m As Integer = c_randh(1, 3)
             If cmbseason = 0 Then colors1 = CInt(Mid("071011", color_bg_m * 2 - 1, 2))
             If cmbseason = 1 Then colors1 = CInt(Mid("020306", color_bg_m * 2 - 1, 2))
             If cmbseason = 2 Then colors1 = CInt(Mid("050609", color_bg_m * 2 - 1, 2))
             If cmbseason = 3 Then colors1 = CInt(Mid("021013", color_bg_m * 2 - 1, 2))
-            darkness = 2 : uppera = bgmtn : lowera = bgmtn : uplight = 250 : lowlight = 150
+            lightera = bgmtn : uplight = 250
+            darkera = bgmtn : lowlight = 150
             bgmtn -= 28
             If bgmtn < 0 Then bgmtn += 30
             applysun = 1
@@ -2642,145 +4254,316 @@ bg_mountains:
 
 land:   'basic warm land colors within CMB season, normally covered over by other things
         If subject = "land" Then
-            Dim color_land As Integer = c_randh(1, 3)
-            If cmbseason = 0 Then colors1 = CInt(Mid("060708", color_land * 2 - 1, 2))
-            If cmbseason = 1 Then colors1 = CInt(Mid("010708", color_land * 2 - 1, 2))
-            If cmbseason = 2 Then colors1 = CInt(Mid("010809", color_land * 2 - 1, 2))
-            If cmbseason = 3 Then colors1 = CInt(Mid("060708", color_land * 2 - 1, 2))
-            darkness = 1 : uppera = 215 : lowera = 190 : uplight = 255 : lowlight = 0
+            If type_fill = 1 Then
+                darkness = 1
+                Dim color_land As Integer = c_randh(1, 3) 'number of color choices OK for that season
+                If cmbseason = 0 Then colors1 = CInt(Mid("060708", color_land * 2 - 1, 2))
+                If cmbseason = 1 Then colors1 = CInt(Mid("010708", color_land * 2 - 1, 2))
+                If cmbseason = 2 Then colors1 = CInt(Mid("010809", color_land * 2 - 1, 2))
+                If cmbseason = 3 Then colors1 = CInt(Mid("060708", color_land * 2 - 1, 2))
+                lightera = 215 : uplight = 255
+                darkera = 190 : lowlight = 0
+                applysun = 1
+                GoTo colorit
+            Else
+                darkness = 0
+                Dim color_land As Integer = c_randh(1, 4)
+                If cmbseason = 0 Then colors1 = CInt(Mid("04051113", color_land * 2 - 1, 2))
+                If cmbseason = 0 Then colors1 = CInt(Mid("02040506", color_land * 2 - 1, 2))
+                If cmbseason = 0 Then colors1 = CInt(Mid("02050609", color_land * 2 - 1, 2))
+                If cmbseason = 0 Then colors1 = CInt(Mid("05060911", color_land * 2 - 1, 2))
+                lightera = 215 : uplight = 255
+                darkera = 100 : lowlight = 0
+            End If
+        End If
+gnarly:
+        If subject = "gnarly" Then
+            Dim colorgnarly As Integer = c_randh(1, 4)
+            darkness = 2
+            If cmbseason = 0 Then colors1 = CInt(Mid("01040111", colorgnarly * 2 - 1, 2))
+            If cmbseason = 1 Then colors1 = CInt(Mid("01031010", colorgnarly * 2 - 1, 2))
+            If cmbseason = 2 Then colors1 = CInt(Mid("01040512", colorgnarly * 2 - 1, 2))
+            If cmbseason = 3 Then colors1 = CInt(Mid("01020204", colorgnarly * 2 - 1, 2))
+            lightera = 150 : uplight = 10
+            darkera = 150 : lowlight = 30
+            GoTo colorit
+        End If
+
+pinetree:
+        If subject = "pineleaves" Or subject = "xmas" Or subject = "bushleaves" Then 'pineleaves refers to the shapely clumps of needles
+            Dim colorpine As Integer = c_randh(1, 2)
+            darkness = 2
+            If cmbseason = 0 Then colors1 = CInt(Mid("0910", colorpine * 2 - 1, 2))
+            If cmbseason = 1 Then colors1 = CInt(Mid("0607", colorpine * 2 - 1, 2))
+            If cmbseason = 2 Then colors1 = CInt(Mid("0308", colorpine * 2 - 1, 2))
+            If cmbseason = 3 Then colors1 = CInt(Mid("0708", colorpine * 2 - 1, 2))
+
+            If colormem <> 0 Then colors1 = colormem
+            If type_fill = 1 Then colormem = colors1
+            lightera = 150 : uplight = 230
+            darkera = 100 : lowlight = 30
+            applysun = 1
+            GoTo colorit
+        End If
+
+        If subject = "pinetree" Then 'refers to the main trunk 
+            Dim colorpine As Integer = c_randh(1, 2)
+            darkness = 2
+            If cmbseason = 0 Then colors1 = CInt(Mid("0411", colorpine * 2 - 1, 2))
+            If cmbseason = 1 Then colors1 = CInt(Mid("1011", colorpine * 2 - 1, 2))
+            If cmbseason = 2 Then colors1 = CInt(Mid("0914", colorpine * 2 - 1, 2))
+            If cmbseason = 3 Then colors1 = CInt(Mid("0304", colorpine * 2 - 1, 2))
+            lightera = 180 : uplight = 80
+            darkera = 10 : lowlight = 0
             GoTo colorit
         End If
 
 river_mountains:
         If subject = "river_mountains" Then  'most all colors on level two will work
+            darkness = randh(1, 2)
             colors1 = randh(1, 14)
-            darkness = randh(1, 2) : uppera = 200 : lowera = 200 : uplight = 250 : lowlight = 0
+            lightera = 150 : uplight = 250
+            darkera = 140 : lowlight = 0
             applysun = 1
             GoTo colorit
         End If
 
 river_trees:
         If subject = "river trees" Then
+            darkness = randh(0, 2)
             colors1 = randh(1, 14)
-            darkness = randh(0, 2) : uppera = 0 : lowera = 240 : uplight = 30 : lowlight = 30
+            lightera = 0 : uplight = 30
+            darkera = 240 : lowlight = 30
             applysun = 1
             GoTo colorit
+        End If
+trunk:
+        If subject = "trunk" Then
+            darkness = 2
+            colors1 = randh(1, 14)
+            lightera = 0 : uplight = 30
+            darkera = 240 : lowlight = 50
         End If
 posts:
         If subject = "post" Then
+            darkness = randh(0, 2)
             colors1 = randh(1, 14)
-            darkness = randh(0, 2) : uppera = 230 : lowera = 240 : uplight = 250 : lowlight = 30
+            lightera = 230 : uplight = 250
+            darkera = 240 : lowlight = 30
             applysun = 1
             GoTo colorit
         End If
+
 other:
-        If subject = "other" Then
-            color1 = c_randh(0, 14) : darkness = c_randh(0, 2) : uppera = 200 : lowera = 50 : uplight = 255 : lowlight = 100
-            'apply direction of sun source
-            applysun = 1
-            GoTo colorit
-        End If
+        'If subject = "other" Or subject = "trunk" etc
+        darkness = c_randh(0, 2)
+        colors1 = randh(1, 14)
+        lightera = 150 : uplight = 255
+        darkera = 150 : lowlight = 0
+        applysun = 1
+        GoTo colorit
 
 colorit:
-
-        Dim CMBbrush As New SolidBrush(Color.Orange)
+        ' present underlying basic color 
+        Dim CMBbrush As New SolidBrush(Color.Empty)
         CMBbrush.Color = ModCMBcolors.getCMBcolor(cmbseason, darkness, colors1)
         g.FillRectangle(CMBbrush, area)
-        If applysun = 0 Or Settings.Ambient = True Or Settings.Above = True Then
+
+
+Sunlightandshadowit:
+        If subject = "pineleaves" Or subject = "pinetree" Or subject = "trunk" Then
             Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
-            Color.FromArgb(uppera, uplight, uplight, uplight), _
-            Color.FromArgb(lowera, lowlight, lowlight, lowlight), _
-            Drawing2D.LinearGradientMode.Vertical)
+            Color.FromArgb(lightera, uplight, uplight, uplight), _
+            Color.FromArgb(200, 0, 0, 0), _
+            Drawing2D.LinearGradientMode.Vertical) 'darker at bottom.  
+            g.FillRectangle(Brush3, area)
+            Return
+        End If
+        If subject = "land" Or subject = "bushleaves" Then
+            Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                           Color.FromArgb(255, Mred, Mgreen, Mblue), _
+                           Color.FromArgb(170, CMBbrush.Color), _
+                           Drawing2D.LinearGradientMode.Vertical)
+            g.FillRectangle(Brush3, area)
+            Return
+        End If
+        If subject = "xmas" Then
+            If Settings.left = True Then
+                Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                Color.FromArgb(130, 200, 200, 200), _
+                Color.FromArgb(170, 0, 0, 0), _
+                Drawing2D.LinearGradientMode.Horizontal)
+                g.FillRectangle(Brush3, area)
+                Return
+            Else
+                If Settings.Right = True Then
+                    Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                               Color.FromArgb(170, 30, 30, 30), _
+                               Color.FromArgb(130, 200, 200, 200), _
+                               Drawing2D.LinearGradientMode.Horizontal)
+                    g.FillRectangle(Brush3, area)
+                    Return
+                End If
+            End If
+        End If
+        If applysun = 0 Or Settings.Above = True Then
+            Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
+                            Color.FromArgb(lightera, uplight, uplight, uplight), _
+                            Color.FromArgb(darkera, lowlight, lowlight, lowlight), _
+                            Drawing2D.LinearGradientMode.Vertical)
             g.FillRectangle(Brush3, area)
         End If
 
         If applysun = 1 Then
             If Settings.Right = True Then 'backwardDiagonal
                 Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
-                            Color.FromArgb(uppera, uplight, uplight, uplight), _
-                            Color.FromArgb(lowera, lowlight, lowlight, lowlight), _
+                            Color.FromArgb(lightera, uplight, uplight, uplight), _
+                            Color.FromArgb(darkera, lowlight, lowlight, lowlight), _
                             Drawing2D.LinearGradientMode.BackwardDiagonal)
                 g.FillRectangle(Brush3, area)
+                Return
             End If
-            If Settings.left = True Then
-                Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
-                             Color.FromArgb(uppera, uplight, uplight, uplight), _
-                             Color.FromArgb(lowera, lowlight, lowlight, lowlight), _
+            If Settings.left = True Then  'forward diagonal
+                Dim Brush3 = New Drawing2D.LinearGradientBrush(area, _
+                             Color.FromArgb(lightera, uplight, uplight, uplight), _
+                             Color.FromArgb(darkera, lowlight, lowlight, lowlight), _
                              Drawing2D.LinearGradientMode.ForwardDiagonal)
                 g.FillRectangle(Brush3, area)
             End If
             If subject = "post" Then
                 Dim Brush3 As New Drawing2D.LinearGradientBrush(area, _
-                             Color.FromArgb(uppera, uplight, uplight, uplight), _
-                             Color.FromArgb(lowera, lowlight, lowlight, lowlight), _
+                             Color.FromArgb(lightera, uplight, uplight, uplight), _
+                             Color.FromArgb(darkera, lowlight, lowlight, lowlight), _
                              Drawing2D.LinearGradientMode.Horizontal)
                 g.FillRectangle(Brush3, area)
             End If
             applysun = 0
         End If
-
-
-
-
     End Sub
 
 
     Private Sub dualcolorblend(ByVal x, ByVal y, ByVal wid, ByVal hgt, ByVal subject, ByVal type_fill)
         Dim area As New Rectangle(x, y, wid, hgt)
-        Dim scheme As Integer = Settings.Scheme
-        Dim domin, dom, lowlight, highlight, shadecolor, shadegray, shadelight, colorno As Integer
-        Dim uppercolor, lowercolor
+        Dim domin, dom, lowlight, shadecolor, shadegray, shadelight, colorno, bs As Integer
+        Dim uppercolor, lowercolor, highlight
         lowlight = c_randh(4, 7)
         highlight = lowlight + 2
-        Select Case subject 'pick lightness of color
-            Case "striate"
-                lowlight = 8 : highlight = 9
-            Case "bg_mountains"
-                lowlight = 5 : highlight = 7
-            Case "river"
-                lowlight = 3 : highlight = 7
-            Case "beach"
-                lowlight = 6 : highlight = 9
-            Case "sea"
-                lowlight = 2 : highlight = 8
-            Case "land"
-                lowlight = 2 : highlight = 7
-        End Select
-        If scheme > 3 Then domin = 1 Else domin = 2
-        dom = Settings.Scheme * domin
+
+        'To get Mlight - pick lightness of color in terms of a small range of colors
+        If subject = "striate" Then lowlight = 8 : highlight = 9
+        If subject = "bg_mountains" Then lowlight = 5 : highlight = 7
+        If subject = "river" Then lowlight = 5 : highlight = 8
+        If subject = "beach" Then lowlight = 8 : highlight = 9
+        If subject = "river trees" Then lowlight = 5 : highlight = 8
+        If subject = "sea" Then lowlight = 4 : highlight = 8
+        If subject = "land" Then lowlight = 4 : highlight = 7
+        If subject = "birchstand" Then lowlight = 8 : highlight = 9
+        If subject = "leaves" Then lowlight = 3 : highlight = 8
+        If subject = "pineleaves" Then lowlight = 3 : highlight = 5
+        If subject = "river_mountains" Then lowlight = 1 : highlight = 7
+        If subject = "trunk" Then lowlight = 1 : highlight = 2
+        'If subject = "rivertrunk" Then lowlight = 2 : highlight = 3
+
+        'setting color dominance through weighting
+        If FormSettings.scheme > 3 Then domin = 1 Else domin = 2 'a functional number, for dominant color
+        dom = FormSettings.scheme * domin
         colorno = c_randh(0, dom)
-        If colorno > Settings.Scheme Then colorno = 0 'setting dominance through weighting
-        M_color = Settings.Colours(colorno)
-        M_gray = c_randh(1, 3)
-        'M_gray = 3
-        M_light = c_randh(lowlight, highlight)
+        If colorno > FormSettings.scheme Then colorno = 0
+
+        M_color = FormSettings.colours(colorno) ' the basic color itself
+        If colormem <> 0 Then M_color = colormem
+        If type_fill = 1 Then colormem = M_color
+        M_gray = c_randh(1, 3) : If subject = "pines" Then M_gray = 3 'saturation level
+        If subject = "flower" Then M_gray = 1
+        M_light = c_randh(lowlight, highlight) ' refers to light or darkness of a color
+
         uppercolor = modColors.getcolor(M_color, M_gray, M_light)
+        Dim brushupper As New SolidBrush(Color.Empty)
+        brushupper.Color = uppercolor
+        If subject = "birchstand" Then
+            bs = c_randh(1, 3)
+            If bs = 2 Then
+                brushupper.Color = Color.White
+            ElseIf bs = 3 Then
+                brushupper.Color = Color.DarkGray
+            End If
+        End If
+        g.FillRectangle(brushupper, area)
 shade:
         'determine a darker color to act as shadow to uppercolor
-        If M_color < 10 Then
-            shadecolor = M_color + Settings.shanum
-            'shanum is shade_number, 1 to 3, calculated in FormSettings
-        Else : shadecolor = M_color - Settings.shanum
+        Dim shadelight_low, shadelight_high As Integer
+        shadecolor = M_color  'keep same color
+        If subject = "river" Then shadecolor = skycolor
+        shadegray = M_gray 'keep same saturation
+        shadelight_low = 1 'darkest representation of that color and saturation
+        shadelight_high = 9 'lightest representation of that color and saturation
+        If subject = "trunk" Then shadelight_high = 5
+        If subject = "striate" Then shadelight = M_light - 1
+        ' If subject = "bg_mountains" Then shadelight = 8
+
+        lowercolor = modColors.getcolor(shadecolor, shadegray, shadelight_low)
+        uppercolor = modColors.getcolor(shadecolor, shadegray, shadelight_high) 'get new uppercolor
+        'make shading vertical
+        Dim n As Integer
+        If subject = "striate" Or Settings.Above = True Or subject = "river" Then
+            n = 100
+            If subject = "river" Then n = 220
+            Dim blendbrushv As New Drawing2D.LinearGradientBrush(area, _
+                       Color.FromArgb(n, uppercolor.r, uppercolor.g, uppercolor.b), _
+                       Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                               Drawing2D.LinearGradientMode.Vertical)
+            g.FillRectangle(blendbrushv, area)
+            Exit Sub
         End If
-        shadegray = M_gray + 1 : If shadegray > 3 Then shadegray = M_gray
-        shadelight = M_light - Settings.shanum - 1 : If shadelight < 1 Then shadelight = 1
-        lowercolor = modColors.getcolor(shadecolor, shadegray, shadelight)
 
-        Dim blendbrush As New Drawing2D.LinearGradientBrush(area, _
-                   Color.FromArgb(uppercolor.a, uppercolor.r, uppercolor.g, uppercolor.b), _
-                   Color.FromArgb(lowercolor.a, lowercolor.R, lowercolor.G, lowercolor.b), _
-                           Drawing2D.LinearGradientMode.Vertical)
-        g.FillRectangle(blendbrush, area)
-
-        If subject = "bgmountain" Then
-            Dim mistbrush As New SolidBrush(Color.FromArgb(bgmtn, 250, 250, 250))
-            g.FillRectangle(mistbrush, area)
-            bgmtn -= 28 : If bgmtn < 0 Then bgmtn = 30
+        'make shading horizontal
+        If subject = "leaves" Or subject = "trunky" Or subject = "birch" Or subject = "trunk" Then
+            Dim blendbrushh As New Drawing2D.LinearGradientBrush(area, _
+                            Color.FromArgb(100, uppercolor.r, uppercolor.g, uppercolor.b), _
+                            Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                    Drawing2D.LinearGradientMode.Horizontal)
+            g.FillRectangle(blendbrushh, area)
+            Exit Sub
+        End If
+        If subject = "birchstand" Then
+            Dim blendbrushh As New Drawing2D.LinearGradientBrush(area, _
+                                      Color.FromArgb(255, 255, 255, 255), _
+                                      Color.FromArgb(255, 0, 0, 0), _
+                                              Drawing2D.LinearGradientMode.Horizontal)
+            g.FillRectangle(blendbrushh, area)
+            Exit Sub
+        End If
+        If subject = "trunk" Then
+            Dim blendbrushd As New Drawing2D.LinearGradientBrush(area, _
+                                  Color.FromArgb(100, uppercolor.r, uppercolor.g, uppercolor.b), _
+                                  Color.FromArgb(200, 0, 0, 0), _
+                                          Drawing2D.LinearGradientMode.Horizontal)
+            g.FillRectangle(blendbrushd, area)
+            Exit Sub
+        End If
+        'make shading diagonal
+        If Settings.left = "true" Then
+            Dim blendbrushd As New Drawing2D.LinearGradientBrush(area, _
+                                  Color.FromArgb(100, uppercolor.r, uppercolor.g, uppercolor.b), _
+                                  Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                          Drawing2D.LinearGradientMode.ForwardDiagonal)
+            g.FillRectangle(blendbrushd, area)
         End If
 
-        Exit Sub
+        'make shading backdiagonal
+        If Settings.Right = "true" Then
+            Dim blendbrushbd As New Drawing2D.LinearGradientBrush(area, _
+                                          Color.FromArgb(100, uppercolor.r, uppercolor.g, uppercolor.b), _
+                                          Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                                  Drawing2D.LinearGradientMode.BackwardDiagonal)
+            g.FillRectangle(blendbrushbd, area)
+        End If
 
-
+        'If subject = "bg_mountains" Then
+        '    Dim mistbrush As New SolidBrush(Color.FromArgb(bgmtn, 250, 250, 250))
+        '    g.FillRectangle(mistbrush, area)
+        '    bgmtn -= 28 : If bgmtn < 0 Then bgmtn = 30
+        'End If
     End Sub
 
     Private Sub makepathpoints()
@@ -2794,14 +4577,18 @@ shade:
     End Sub
 
     Private Sub CMBcolordisplay()
-        Dim x, y, width, height As Integer
-        x = 10
+        Dim x, y, sy, width, height, l, t, m As Integer
+
+        x = 90
         y = 20
         width = 30
         height = 30
-
+        l = 5
         For i As Integer = 0 To 3
             For j As Integer = 0 To 2
+                If j = 1 Then
+
+                End If
                 For k As Integer = 1 To 14
                     Dim box As New Rectangle(x, y, 20, 20)
                     Dim paintbrush As New SolidBrush(Color.Black)
@@ -2809,16 +4596,31 @@ shade:
                     g.FillRectangle(paintbrush, box)
                     x += 27
                 Next k
-                x = 10
+
+                x = 90
                 y += 22
             Next j
-            x = 10
+            x = 90
             y += 30
+            g.DrawString("1       2        3       4       5      6       7        8      9      10     11     12     13     14", _
+                                         New Font("arial", 8), Brushes.Black, New RectangleF(96, l, 800, 14))
+            l += 96
         Next i
-        'If n = 1 Then endit = 14
-        'If n = 2 Then endit = 14 : start = 1
-        x = 10
-        ' Next
+        Dim cmbtypestring, darkness_string As String
+        y = 45
+        sy = 23
+        For t = 0 To 3
+            cmbtypestring = "CMB" & " " & CStr(t)
+            g.DrawString(cmbtypestring, New Font("arial", 8), Brushes.Black, New RectangleF(10, y, 800, 14))
+            y += 97
+            For m = 0 To 2
+                darkness_string = CStr(m)
+                g.DrawString(darkness_string, New Font("arial", 8), Brushes.Black, New RectangleF(77, sy, 800, 14))
+                sy += 22
+            Next
+            sy += 30
+        Next
+
     End Sub
 
     Private Sub colordisplayreg()
@@ -2857,12 +4659,7 @@ shade:
             f = 18
         Next n
     End Sub
-    Private Sub coloraerial()
 
-
-
-
-    End Sub
     Private Sub makeskyfluffclouds()
         Dim x, y, a, b, c, d As Integer
 
@@ -2891,8 +4688,8 @@ shade:
     End Sub
     Private Sub makeskyfluffcover(ByVal x, ByVal y, ByVal wid, ByVal hgt)
 
-        Dim fluffwidth As Integer = randh(200, 250)
-        Dim fluffheight As Integer = randh(25, 40)
+        Dim fluffwidth As Integer = randh(200, 450)
+        Dim fluffheight As Integer = randh(25, 340)
         ''Fill an ellipse setting CenterColor and SurroundColors.
 
         Dim rect_pts() As Point = {New Point(x, y), New Point(x + fluffwidth, y), _
@@ -2912,12 +4709,32 @@ shade:
 
 
     End Sub
-    Private Sub makeskyevening()
-        Dim a As Integer = 0
-        'Dim rect As New Rectangle(0, 0, Image.Width, Image.Height)
-        'Dim rec_brush As New SolidBrush(Color.Blue)
+    Private Sub ellipseondark()
+        Dim a As Integer = 200
+        Dim colors1 As Integer
+        Dim rect As New Rectangle(0, 0, Image.Width, Image.Height)
+        Dim rec_brush As New SolidBrush(Color.Black)
+        If FormSettings.scheme > 9 Then cmbseason = FormSettings.scheme - 10
+        Dim color_land As Integer = c_randh(1, 3)
+        If cmbseason = 0 Then colors1 = CInt(Mid("010411", color_land * 2 - 1, 2))
+        If cmbseason = 1 Then colors1 = CInt(Mid("101112", color_land * 2 - 1, 2))
+        If cmbseason = 2 Then colors1 = CInt(Mid("010513", color_land * 2 - 1, 2))
+        If cmbseason = 3 Then colors1 = CInt(Mid("010204", color_land * 2 - 1, 2))
 
-        'g.FillRectangle(rec_brush, rect)
+        rec_brush.Color = ModCMBcolors.getCMBcolor(cmbseason, 2, colors1)
+        g.FillRectangle(rec_brush, rect)
+
+        cmbseason = FormSettings.scheme - 10 'CMB color seasons from 0 to 3
+        Dim color1, tone As Integer
+        If cmbseason = 0 Then color1 = 4
+        If cmbseason = 1 Then color1 = 2
+        If cmbseason = 2 Then color1 = 2
+        If cmbseason = 3 Then color1 = 3
+        tone = 1
+
+        Dim CMBbrush As New SolidBrush(Color.Orange)
+        CMBbrush.Color = ModCMBcolors.getCMBcolor(cmbseason, tone, color1)
+        'g.FillRectangle(CMBbrush, rect)
 
         Dim rect_pts() As Point = {New Point(-a, -a), New Point(Image.Width + a, -a), _
          New Point(Image.Width + a, Image.Height + a), New Point(-a, Image.Height + a)}
@@ -2927,140 +4744,209 @@ shade:
         ellipse_path.AddEllipse(-a, -a, Image.Width + a, Image.Height + a)
         path_brush = New Drawing2D.PathGradientBrush(ellipse_path)
 
-        '  path_brush.CenterColor = findcolor(1)
+        path_brush.CenterColor = CMBbrush.Color
         path_brush.SurroundColors = New Color() {Color.Empty}
         g.FillEllipse(path_brush, -a, -a, Image.Width + a, Image.Height + a)
-        ' Dim rec_brush As New SolidBrush(Color.path_brush.surroundcolors)
-
-        '' ellipse_path.Reset()
-        'grays = CInt(CStr(Mid("050088120147170190210230245", (light * 3 - 2), 3)))
-        'Dim opaque As Integer = 120 '190
-        'Dim gy As Integer = grays
-        'Dim graybrush As New SolidBrush(Color.Empty)
-        'graybrush.Color = Color.FromArgb(opaque, gy, gy, gy)
-
 
 
     End Sub
 
 
-    Private Sub makemidpines()
-        Dim brush As New SolidBrush(Color.Green)
-        Dim a, b, c, plx, ply, anchorx, anchory, pc, pd, tipx, bleftx, brightx As Integer
-        Dim ra, rb, rc, rd, branchx, branchy As Single
-        Dim trunk, branch As New Drawing2D.GraphicsPath
-        a = Image.Width - 100
-        b = Image.Height - 150 : c = Image.Height - 250
-        anchorx = randh(0, a) 'anchor the tree area
-        anchory = randh(b, c)
+    Private Sub bushleaves(ByVal x0, ByVal y0, ByVal distance)
+        'x0 and y0 are groundzero points for placing this bushleaf.
+        'distances sent to this site should be between 5 ft and 25 ft.
+        Dim width, wid, ht, w, ww, h, hh, height, centerx, centery, xx0, yy0 As Single
+        Dim x1, y1, r0t, width1, height1, beginx As Integer
+        Dim plx, ply, pc, tipx, bleftx, brightx, beginy As Integer
+        Dim n, ra, rb, rd, branchx, branchy As Single
+        wid = 3 ' in feet 'of leaf clump
+        ht = 2 ' in feet
 
-        For n As Integer = 1 To 7
-            a = anchorx + randh(7, 20)
-            'b = Image.Height - 200
-            c = anchory - yrand(10)
-            plx = randh(0, a) 'place the branch
-            ply = randh(b, c)
-variable:   pc = randh(70, 110)  ' extent of rectangle (ellipse)
-            pd = randh(20, 50)
-            Dim rect As New Rectangle(plx, ply, pc, pd)
+        width = pixelheight(wid, distance) 'of clump size
+        height = pixelheight(ht, distance)
+        beginx = x0
+        beginy = y0 - height
+        Dim piepath1, piepath2, trunk, branch, flower As New Drawing2D.GraphicsPath
+        Dim leaves As New Rectangle(beginx, beginy, width, height)
+        Dim brush1 As New SolidBrush(Color.Empty)
 
-            For i = 1 To 3
-                ra = randh(335, 365)        'points for pie shapes - by angles
-                rb = randh(10, 35)
-                rc = randh(170, 185)
-                rd = randh(15, 35)
-                g.FillPie(brush, rect, ra, rb)
+        flower.AddEllipse(leaves)
+        g.SetClip(flower)
+        r0t = 240 'rotation angle ' for rotation of leaves into hanging downward
+        width1 = width * 1.5 'expanded room to thin out leaves in extremities
+        height1 = height * 1.5 '  ""
+        x1 = beginx - (width1 - width) ' ""
+        y1 = beginy - (height1 - height) '  ""
+        w = 0.3 'in feet of individual leaf width
+        h = 0.3 'in feet of "  " height
+        ww = pixelheight(w, distance) 'of individual leaf
+        hh = pixelheight(h, distance) '  ""
 
-                rect.Y += yrand(20)
-                rect.X += yrand(10)
-                g.FillPie(brush, rect, rc, rd)
+        For pc = 1 To 2 '           per clump of leaves
+            If pc = 2 Then
+                width = width1 '  expanded width and height of area to put leaves in
+                height = height1
+                beginx = x1
+                beginy = y1
+            End If
+
+            For n = 1 To 25
+                xx0 = beginx + yrand(width) 'leaves grouped within a given location: beginx, beginy, height,etc.
+                yy0 = beginy + yrand(height)
+                ww = ww + ww * 0.01  'rectangular width size of leaf expanding in width
+                hh = hh + hh * 0.01 '   "    height of leaf expanding in height
+                centerx = xx0 + ww / 2
+                centery = yy0 + hh / 2
+                Rotate(centerx, centery, r0t)
+                piepath1 = New Drawing2D.GraphicsPath
+                piepath2 = New Drawing2D.GraphicsPath
+                ra = yrand(40)        'beginning point for pie shape - not far from zero degrees
+                rb = ra + 140
+                rd = ra - 165 ' this much angle needed in reverse to get a similar shape
+                piepath1.AddArc(xx0, yy0, ww, hh, ra, rb)
+                piepath2.AddArc(xx0, yy0, ww, hh, ra, rd)
+                g.SetClip(piepath1)
+
+                colorblend(piepath1.GetBounds.X, piepath1.GetBounds.Y, piepath1.GetBounds.Width, _
+                piepath1.GetBounds.Height, "bushleaves", n)
+                g.ResetClip()
+
+                g.SetClip(piepath2)
+                colorblend(piepath2.GetBounds.X, piepath2.GetBounds.Y, piepath2.GetBounds.Width, _
+               piepath2.GetBounds.Height, "bushleaves", n)
+                RotateBack(centerx, centery, r0t)
+                g.ResetClip()
             Next
+        Next
+        ' Return
+trunk:
+        trunk = New Drawing2D.GraphicsPath
+        branch = New Drawing2D.GraphicsPath
+        tipx = plx + pc / 2 - 15
+        bleftx = (tipx + randsign() * yrand(10))
+        brightx = bleftx + 3
+        Dim point0 As New Point(tipx, ply)
+        Dim point1 As New Point(bleftx, ply + 150)
+        Dim point2 As New Point(brightx, ply + 150)
+        Dim curvepoints As Point() = {point0, point1, point2}
+        trunk.AddClosedCurve(curvepoints)
+        g.FillPath(Brushes.Black, trunk)
 
-            trunk = New Drawing2D.GraphicsPath
-            branch = New Drawing2D.GraphicsPath
-            tipx = plx + pc / 2 - 15
-            bleftx = (tipx + randsign() * yrand(10))
-            brightx = bleftx + 3
-            Dim point0 As New Point(tipx, ply)
-            Dim point1 As New Point(bleftx, ply + 150)
-            Dim point2 As New Point(brightx, ply + 150)
-            Dim curvepoints As Point() = {point0, point1, point2}
-            trunk.AddClosedCurve(curvepoints)
-            g.FillPath(Brushes.Black, trunk)
+        Dim trunkpts
+        trunkpts = trunk.PathPoints 'finding trunk points for branches
+        Dim tkx, tky As Single
+        For t As Integer = 0 To 1
+            tkx = yrand(trunkpts(8).x - trunkpts(6).x)
+            tky = yrand(trunkpts(8).y - trunkpts(6).y) - 5
+            branchx = trunkpts(6).x + tkx
+            branchy = trunkpts(6).y + tky
+            Dim point3 As New Point(branchx, branchy)
+            Dim rs As Integer = randsign()
+            Dim rsy As Integer = randsign()
+            Dim vr As Single = randh(5, 12)
+            Dim vry As Single = randh(5, 12)
+            Dim branch2x, branch2y, branch3x, branch3y As Single
+            branch2x = branchx + rs * vr
+            branch2y = branchy + rsy * vr
+            Dim point4 As New Point(branch2x, branch2y)
+            branch3x = branch2x + rs * vr
+            branch3y = branch2y
+            Dim point5 As New Point(branch3x, branch3y)
+            Dim curvepoints2 As Point() = {point3, point4, point5}
+            branch.AddCurve(curvepoints2)
+            g.DrawCurve(Pens.Black, curvepoints2)
+        Next
+        'Dim branchh
+        'branchh = branch.PathPoints       
 
-            Dim trunkpts
-            trunkpts = trunk.PathPoints 'finding trunk points for branches
-            Dim tkx, tky As Single
-            For t As Integer = 0 To 1
-                tkx = yrand(trunkpts(8).x - trunkpts(6).x)
-                tky = yrand(trunkpts(8).y - trunkpts(6).y) - 5
-                branchx = trunkpts(6).x + tkx
-                branchy = trunkpts(6).y + tky
-                Dim point3 As New Point(branchx, branchy)
-                Dim rs As Integer = randsign()
-                Dim rsy As Integer = randsign()
-                Dim vr As Single = randh(5, 12)
-                Dim vry As Single = randh(5, 12)
-                Dim branch2x, branch2y, branch3x, branch3y As Single
-                branch2x = branchx + rs * vr
-                branch2y = branchy + rsy * vr
-                Dim point4 As New Point(branch2x, branch2y)
-                branch3x = branch2x + rs * vr
-                branch3y = branch2y
-                Dim point5 As New Point(branch3x, branch3y)
-                Dim curvepoints2 As Point() = {point3, point4, point5}
-                branch.AddCurve(curvepoints2)
-                g.DrawCurve(Pens.Black, curvepoints2)
+
+    End Sub
+    Private Sub xmastree(ByVal x0, ByVal y0, ByVal distance)
+        Dim ra, rb, plx, ply, pc, pcf, pdf, pcm, pd, plym As Integer
+        Dim xmas As New Drawing2D.GraphicsPath
+
+        For i = 1 To 1
+            plx = x0
+            ply = y0
+
+            pcf = 5 'normal width of a tree at the base
+            pdf = 10 'height at base section of tree, will retain this ratio
+            pc = pixelheight(pcf, distance)
+            pd = pixelheight(pdf, distance)
+
+            ' Dim brush1 As New SolidBrush(Color.Green)
+            For n As Integer = 1 To 15
+
+                Dim rect As New Rectangle(plx, ply, pc, pd)
+                xmas = New Drawing2D.GraphicsPath
+                ra = randh(335, 375) - 20 '355       'points for pie shapes - by angles
+                rb = randh(165, 205) + 30 '185
+                ' g.FillPie(brush1, rect, ra, rb)
+                xmas.AddArc(plx, ply, pc, pd, ra, rb)
+                g.SetClip(xmas)
+                colorblend(xmas.GetBounds.X, xmas.GetBounds.Y, xmas.GetBounds.Width, xmas.GetBounds.Height, "xmas", n)
+                pcm = pc 'pc memory - for determining x movement to center the tree
+                g.ResetClip()
+                If n = 1 Then membasey = ply + pd 'place height of base of tree in memory
+                plym = pd
+                pc *= 0.8
+                pd *= 0.8
+                plx = plx + (pcm - pc) / 2
+                ply = ply - (plym - pc) / 3
             Next
-            'Dim branchh
-            'branchh = branch.PathPoints       
         Next
 
     End Sub
 
-    'Private Sub makecloseupwater()
+    Private Sub birch()
+        Dim x(8), y(8) As Integer
 
-    'End Sub
-    'Private Sub makeoceanwaves()
+        x(0) = yrand(Image.Width) 'beginning point - upper left
+        y(0) = 0
+        x(1) = x(0) + randh(10, 36) 'other side of top
+        y(1) = 0
+        x(2) = x(0) + randsign() * yrand(30) 'bottom left
+        y(2) = Image.Height
+        x(3) = x(2) + (x(1) - x(0)) + yrand(5) 'bottom right
+        y(3) = Image.Height
 
-    'End Sub
-    'Private Sub makebeachfront()
-
-    'End Sub
-    'Private Sub ptsarray()
-    '    Dim rect As New Rectangle(20, 20, 200, 100)
-    '    Dim ptsarray As Single()() = {New Single() {1, 0, 0, 0, 0}, New Single() {0, 1, 0, 0, 0}, _
-    '    New Single() {0, 0, 1, 0, 0}, New Single() {0, 0, 0, 0.5F, 0}, New Single() {0, 0, 0, 0, 1}}
-
-    '    'Dim clrMatrix As New   - nothing works form here on in
-    '    'Dim imgAttributes As New imageattributes()
-
-
-
-    'End Sub
-    'Private Sub makeroadway()
-    '    'ROADWAY    
-    '    '   Hills to traverse, up and down
-    '    '   direction 
-    '    '   edges
-    'End Sub
-    Private Sub makemist()
-
+        Dim point0 As New Point(x(0), y(0))
+        Dim point1 As New Point(x(1), y(1))
+        Dim point2 As New Point(x(2), y(2))
+        Dim point3 As New Point(x(3), y(3))
+        Dim trunk As New Drawing2D.GraphicsPath
+        trunk.AddLine(point0, point1)
+        trunk.AddLine(point1, point3)
+        trunk.AddLine(point3, point2)
+        trunk.AddLine(point2, point0)
+        g.SetClip(trunk)
+        colorblend(trunk.GetBounds.X, trunk.GetBounds.Y, trunk.GetBounds.Width, _
+            trunk.GetBounds.Height, "birch", 1)
+        If Settings.Outlines = True Then g.DrawPath(outlinepen, trunk)
+        g.ResetClip()
+    End Sub
+    Private Sub makemist(ByVal mistlevel) 'no. times mist of 25 - up to a maximum of 10
+        Dim a, b As Integer
+        a = 25 * mistlevel
+        b = 245
         Dim rect5 As New Rectangle(0, 0, Image.Width, Image.Height)
+        Dim makemist As New SolidBrush(Color.FromArgb(a, b, b, b))
+        g.FillRectangle(makemist, rect5)
 
-        If randsign() = 1 Then
-            Dim lBrush2 As New Drawing2D.LinearGradientBrush(rect5, _
-            Color.FromArgb(255, (220), (220), (250)), _
-            Color.FromArgb(30, 220, 220, 255), _
-            Drawing2D.LinearGradientMode.Vertical)
-            g.FillRectangle(lBrush2, rect5)
-        Else
-            Dim lBrush2 As New Drawing2D.LinearGradientBrush(rect5, _
-                   Color.FromArgb(30, 220, 220, 200), _
-                   Color.FromArgb(255, (220), (220), (200)), _
-                   Drawing2D.LinearGradientMode.Vertical)
-            g.FillRectangle(lBrush2, rect5)
-        End If
+
+        ''  If randsign() = 1 Then
+        'Dim brush2 As New Drawing2D.LinearGradientBrush(rect5, _
+        'Color.FromArgb(255, (220), (20), (220)), _
+        'Color.FromArgb(30, 220, 220, 200), _
+        'Drawing2D.LinearGradientMode.Vertical)
+        'g.FillRectangle(brush2, rect5)
+        ''Else
+        'Dim lBrush2 As New Drawing2D.LinearGradientBrush(rect5, _
+        '     Color.FromArgb(100, 220, 220, 200), _
+        '     Color.FromArgb(200, (220), (220), (200)), _
+        '      Drawing2D.LinearGradientMode.Vertical)
+        'g.FillRectangle(lBrush2, rect5)
+        ' End If
 
 
     End Sub
@@ -3078,86 +4964,63 @@ variable:   pc = randh(70, 110)  ' extent of rectangle (ellipse)
         c_randh = Int(((high - low) + 1) * FColorRandom.NextDouble + low)
     End Function
 
-    Private Sub trial_distanceformula()
-        Dim x, y, y1, y2, p, n As Integer
-        Dim v, d, h, height1, width1 As Single
+    Private Sub trialcolorshade()
+        Dim uppercolor, lowercolor
+        Dim shadecolor, shadegray, shadelight As Integer
+        M_color = yrand(18)
+        M_gray = randh(2, 3)
+        M_light = randh(3, 9)
+        uppercolor = modColors.getcolor(M_color, M_gray, M_light)
+        Dim brush1 As New SolidBrush(Color.Red)
 
-        v = 2      'distance from eye to aperture, a constant during the painting
-        d = 0       'distance from eye to object, in feet
-        h = 0       'real height of object, in feet
-        y1 = 0      'vertical placement of bottom of object, in pixels  -supplied
+        Dim area1 As New Rectangle(50, 150, 200, 200)
+        Dim area2 As New Rectangle(300, 150, 200, 200)
+        Dim area3 As New Rectangle(520, 150, 200, 200)
+        Dim area4 As New Rectangle(0, 250, 780, 10)
+        g.FillRectangle(brush1, area4)
 
-        y2 = 0      'calculated placment of top of object, in pixels 
-        p = 800     'number of pixels per foot of height (given about 75 pixels per inch)
+        'determine a darker color to act as shadow to uppercolor
+        shadecolor = M_color
+        shadegray = M_gray
+        shadelight = 1
 
-        ' formula: y2=y1-(v*h*p/d)
-        Dim brush As New SolidBrush(Color.Red)
-
-        'in terms of an ellipse/rectangle
-        v = 2
-        h = 75 'known height in feet
-        Dim dist_path As New Drawing2D.GraphicsPath
-        '  For w As Integer = 1 To 2
-        'For n = 300 To 190 ' to calculate further distances first
-        d = 500
-        ' y2 = 250 + 40 / n
-        height1 = v * h * p / d
-        width1 = height1 / 20
-        'x = n * 10
-        'y = 100 - n
-        x = 300 : y = 50
-
-        Dim rect As New Rectangle(x, y, width1, height1)
-        g.FillRectangle(brush, rect)
-        g.DrawRectangle(Pens.Black, rect)
-        If n > 16 Then dist_path.AddRectangle(rect)
-        ' Next n
-        g.FillPath(Brushes.Red, dist_path)
-        '  q = -1
-        '  brush.Color = Color.Aquamarine
-        '  Next w
+        lowercolor = modColors.getcolor(shadecolor, shadegray, shadelight)
+        Dim mess As String = CStr(M_light) & " " & CStr(shadelight) & " color: " & CStr(M_color)
 
 
+        If Settings.left = True Then
+            Dim blendbrush1 As New Drawing2D.LinearGradientBrush(area1, _
+                            Color.FromArgb(255, uppercolor.r, uppercolor.g, uppercolor.b), _
+                            Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                    Drawing2D.LinearGradientMode.Vertical)
+            g.FillRectangle(blendbrush1, area1)
+            g.DrawString(mess, New Font("arial", 10), Brushes.Black, New RectangleF(50, 210, 100, 30))
+        End If
+        'lowercolor = modColors.getcolor(shadecolor, shadegray, shadelight)
+        If Settings.left = True Then
+            Dim blendbrush2 As New Drawing2D.LinearGradientBrush(area2, _
+                                    Color.FromArgb(255, uppercolor.r, uppercolor.g, uppercolor.b), _
+                                    Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                            Drawing2D.LinearGradientMode.ForwardDiagonal)
+            g.FillRectangle(blendbrush2, area2)
+            g.DrawString(mess, New Font("arial", 10), Brushes.Black, New RectangleF(300, 210, 100, 30))
+        End If
 
-
-        ''in terms of a cloud
-        'p = 800   'pixels per foot
-        'v = 1       'from eye to aperture
-        'h = 500 'assumed height of cloud
-        'q = 1
-        'd = 1
-        '' For w As Integer = 1 To 2
-        '' For d = 1000 To 21000 Step 5000  'to calculate further distances first
-        'y2 = 250 + 40 / n
-
-        Dim rect1 As New Rectangle(0, horizon, Image.Width, Image.Height - horizon)
-        ' g.FillRectangle(Brushes.BlueViolet, rect1)
-
-        'For n = 0 To 4
-        '    p = 800
-        '    h = 50
-        '    For j As Integer = 1 To 5 - n
-        '        r1 = horizon - 40 * n
-        '        r2 = r1 - 40
-        '        x = yrand(Image.Width)
-        '        y = randh(r2, r1)
-        '        d = 50000 / (horizon - y)
-        '        height1 = v * h * p / d
-        '        width1 = height1 * 1.4
-        '        rect = New Rectangle(x, y, width1, -height1)
-        '        brush.Color = Color.FromArgb(255, 255, 255, 255)
-        '        g.FillEllipse(brush, rect)
-        '        'g.DrawEllipse(Pens.Black, rect)
-        '    Next j
-        'Next n
-
-
-
+        If Settings.left = True Then
+            'lowercolor = modColors.getcolor(shadecolor, shadegray, shadelight)
+            Dim blendbrush3 As New Drawing2D.LinearGradientBrush(area3, _
+                                           Color.FromArgb(255, uppercolor.r, uppercolor.g, uppercolor.b), _
+                                           Color.FromArgb(255, lowercolor.R, lowercolor.G, lowercolor.b), _
+                                                   Drawing2D.LinearGradientMode.BackwardDiagonal)
+            g.FillRectangle(blendbrush3, area3)
+            g.DrawString("black (0)", New Font("arial", 10), Brushes.Black, New RectangleF(550, 210, 100, 30))
+        End If
     End Sub
     Public Function pixelheight(ByVal height, ByVal distance)
         Dim y, v As Single
         v = 1
         y = (v * height * 800) / distance
+        'y = (v * height * 500) / distance
         Return y
     End Function
 
@@ -3176,7 +5039,7 @@ variable:   pc = randh(70, 110)  ' extent of rectangle (ellipse)
         branch_angle = randh(-30, 30)
         'branch_path.AddEllipse(rect)
         Dim subject As String = "branch" : Dim type As String = "ellipse"
-        colorblend(xbegin1, ybegin1, xwidth1, yheight1, subject, type)
+        colorblend(xbegin1, ybegin1, xwidth1, yheight1, subject, 0)
         'Rotate(xbegin1 + xwidth1 / 2, ybegin1 + yheight1, branch_angle)
         Rotate(xbegin1 + xwidth1 / 2, ybegin1 + yheight1 / 2, branch_angle)
         ' g.FillPie(brush1, rect, ra, rb)
@@ -3289,30 +5152,29 @@ variable:   pc = randh(70, 110)  ' extent of rectangle (ellipse)
         '                xbegin1 = riverpts(i).x + q * xwidth1 + q * randh(0, 10)
         '                'ybegin1 = riverpts(i).y - yheight1 - 5
     End Sub
-    Private Sub trialtrees()
-        Dim x, y, x1, y1, width, height, wid, hgt As Integer
-        x = 100 : y = 100
-        ' height  
-        width = 100 : height = 300
-        Dim rect As New Rectangle(x, y, width, height)
-        g.FillRectangle(Brushes.BurlyWood, rect)
-        Dim path As New Drawing2D.GraphicsPath
-        path.AddRectangle(rect)
-        Dim rects As New Rectangle
-        Dim brush As New SolidBrush(Color.Green)
+    'Private Sub trialtrees()
+    '    Dim x, y, x1, y1, width, height, wid, hgt As Integer
+    '    x = 300 : y = 300
+    '    ' height  
+    '    width = 100 : height = 300
+    '    Dim rect As New Rectangle(x, y, width, height)
+    '    g.FillRectangle(Brushes.BurlyWood, rect)
+    '    Dim path As New Drawing2D.GraphicsPath
+    '    path.AddRectangle(rect)
+    ' colorblend
 
-        For n As Integer = 1 To 20
-            x1 = yrand(width) + x
-            y1 = yrand(height) + y
-            wid = yrand(width / 2)
-            hgt = yrand(height / 2)
-            rects = New Rectangle(x1, y1, wid, hgt)
-            g.FillEllipse(brush, rects)
+    'For n As Integer = 1 To 20
+    '    x1 = yrand(width) + x
+    '    y1 = yrand(height) + y
+    '    wid = yrand(width / 2)
+    '    hgt = yrand(height / 2)
+    '    rects = New Rectangle(x1, y1, wid, hgt)
+    '    g.FillEllipse(brush, rects)
 
-        Next
+    ' Next
 
 
-    End Sub
+
     Private Sub housedesign()
         'from placebuilding()
         Dim wallheight, wallheight_y, peakht, peakface, frontwidth, _
@@ -3537,9 +5399,9 @@ foundation:  'or footings
         spath.AddPolygon(wall)
         g.SetClip(spath)
         If subject = "pole" Then
-            colorblend(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, subject, 2)
+            colorblend(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, subject, 0)
         Else
-            doflatcolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
+            doflathousecolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
         End If
         g.ResetClip()
         If Settings.Outlines = True And subject <> "v_aboveshade" Then g.DrawPolygon(stainedglasspen, wall)
@@ -3780,8 +5642,8 @@ foundation:  'or footings
         joinfour(lpx, lpy, pfcx, pfcy, prcx, prcy, rpx, rpy, "deck")
         If rowhousetype <> "withlowdeck" Then 'place posts
             If pw < 1 Then pw = 1
-            colorblend(pfcx - pw, pfcy, pw, ph, "post", 3)
-            colorblend(prcx - 3, diffy, 3, ph2, "post", 3)
+            colorblend(pfcx - pw, pfcy, pw, ph, "post", 0)
+            colorblend(prcx - 3, diffy, 3, ph2, "post", 0)
             If Settings.Outlines = True Then
                 g.DrawRectangle(Pens.Black, pfcx - pw, pfcy, pw, ph)
                 g.DrawRectangle(Pens.Black, prcx - 3, diffy, 3, ph2)
@@ -3812,7 +5674,7 @@ foundation:  'or footings
         Dim fourpath As New Drawing2D.GraphicsPath
         fourpath.AddPolygon(quart)
         g.SetClip(fourpath)
-        doflatcolor(fourpath.GetBounds.X, fourpath.GetBounds.Y, fourpath.GetBounds.Width, fourpath.GetBounds.Height, 2, subject)
+        doflathousecolor(fourpath.GetBounds.X, fourpath.GetBounds.Y, fourpath.GetBounds.Width, fourpath.GetBounds.Height, 2, subject)
         g.ResetClip()
         If Settings.Outlines = True And subject <> "leftshade" And subject <> "chimneyshadow" And subject <> "pipeshadow" Then
             g.DrawPolygon(stainedglasspen, quart)
@@ -3871,7 +5733,7 @@ foundation:  'or footings
         Dim spath As New Drawing2D.GraphicsPath
         spath.AddPolygon(wall)
         g.SetClip(spath)
-        doflatcolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
+        doflathousecolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
         g.ResetClip()
         If Settings.Outlines = True Then g.DrawPolygon(stainedglasspen, wall)
 
@@ -3887,7 +5749,7 @@ foundation:  'or footings
         Dim spath As New Drawing2D.GraphicsPath
         spath.AddPolygon(wall)
         g.SetClip(spath)
-        doflatcolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
+        doflathousecolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
         g.ResetClip()
         If Settings.Outlines = True And subject <> "frontshade" Then g.DrawPolygon(stainedglasspen, wall)
     End Sub
@@ -3902,7 +5764,7 @@ foundation:  'or footings
         Dim spath As New Drawing2D.GraphicsPath
         spath.AddPolygon(wall)
         g.SetClip(spath)
-        doflatcolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, "peakside")
+        doflathousecolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, "peakside")
         g.ResetClip()
         If Settings.Outlines = True Then g.DrawPolygon(stainedglasspen, wall)
 
@@ -3913,7 +5775,7 @@ foundation:  'or footings
         If wid < 2.5 Then Exit Sub
         lapy = Ay
         Dim lappen As New Pen(Color.Black)
-        If Settings.Scheme < 10 Then
+        If FormSettings.scheme < 10 Then
             lappen.Color = modColors.getcolor(wallsltcolor, 2, wallsdktone)
         Else
             lappen.Color = ModCMBcolors.getCMBcolor(cmbseason, wallsdktone, wallsdkcolor)
@@ -3939,7 +5801,7 @@ foundation:  'or footings
         spath.AddPolygon(wall)
         g.SetClip(spath)
         Dim subject As String = "nonpeakside"
-        doflatcolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
+        doflathousecolor(spath.GetBounds.X, spath.GetBounds.Y, spath.GetBounds.Width, spath.GetBounds.Height, 2, subject)
         g.ResetClip()
         If Settings.Outlines = True Then g.DrawPolygon(stainedglasspen, wall)
 
@@ -3950,7 +5812,7 @@ foundation:  'or footings
         If wid < 2.5 Then Exit Sub
         lapy = Ay
         Dim lappen As New Pen(Color.Black)
-        If Settings.Scheme < 10 Then
+        If FormSettings.scheme < 10 Then
             lappen.Color = modColors.getcolor(wallsltcolor, 2, wallsdktone)
         Else
             lappen.Color = ModCMBcolors.getCMBcolor(cmbseason, wallsdktone, wallsdkcolor)
