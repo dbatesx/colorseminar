@@ -205,174 +205,7 @@ River:
 
 
     End Sub
-    Private Sub golf()
-        Dim holedistance, totwindstrength, windstrength, hole_elevation, distance_w_elev, _
-        rough_lie, spin, clubpower, windlieclub As Integer
-        Dim roughclub, windfactor, factor1, Ffactor, difference, fdifference As Single
-        Dim clubselection As String = "5i"
-        Dim winddirection As String = "into"
-        Dim swingselection As String = "chip"
-        Dim fullclubselection As String
-        Dim holeID As String
-        Dim a, b As String
-        b = "_________________________________________________________________________________"
 
-Enterdetails:
-
-        'Enter the following details
-        holeID = "Kiawah 7"
-        hole_elevation = 7      'in feet
-        holedistance = 29      'in yards
-        totwindstrength = 0    'in mph. 
-        windstrength = 0       'Remember how you got it for formula.
-        winddirection = "into"    '(i means facing into the wind, "w"(with)means the wind is coming from behind you.)
-        clubselection = "PW"    'select details from below
-        swingselection = "pitch" ' out of full, pitch, punch, chip
-        clubpower = 37
-        spin = 0    '(out of 3, more spin = 3)
-        rough_lie = 0
-
-        a = "____________________________________________________________________________________"
-
-        'ClubPower:  
-        '        Club   Full    Punch   Pitch   Chip    Flop
-        '        D      235     205
-        '        3WD    222     206
-        '        3H     202     190
-        '        3i     200     185     85
-        '        4i     187     170     69
-        '        5i     175     155     60      41
-        '        6i     160     143     56      36
-        '        7i     145     128     50      31
-        '        8i     130     115     45      27
-        '        9i     120     107     41      24  
-        '        PW     110     95      37      20
-        '        SW     70      59      22      11      24
-        '        60W    55      45      15      7       18
-
-
-        fullclubselection = clubselection + "   " + CStr(clubpower) + " "
-
-EFFECTS_ON_HOLE_DISTANCE:
-
-Elevation_Effects:
-        'usually measured in feet but is also seen in inches.  The importance of small distances remains to be seen.
-        'I presently do not know how to make use of this factor in determining how much power a ball should be hit with.
-        'therefore I deal with theories and trials.
-        'maybe use angle from ball to hole and multiply
-        Dim s_elevation_factor As String = "D=D+or-elev"
-
-        If hole_elevation > 0 Then distance_w_elev = holedistance + hole_elevation
-        If hole_elevation < 0.1 Then distance_w_elev = holedistance - hole_elevation
-
-EFFECTS_ON_CLUB_DISTANCE:
-
-RoughLie_Effects:  'the rough_lie factor reduces the distance of the club
-
-        Dim s_roughfactor As String = "1st no.%"
-        roughclub = clubpower - rough_lie 'lie = either 10,20,30,40 etc, the first number of the lie.
-
-Wind_Effects:
-        'determining windfactor and the new yardage capacity or clubpower of the club, winddegrees will be used later.
-        'will likely be providing more accurate estimates of wind with an against me, but presently just taking 75% of share to affect the ball flight.
-
-        Dim s_windportion As String = CStr(windstrength) + "/" + CStr(totwindstrength)
-
-        If winddirection = "with" Then windfactor = (0.005 * windstrength) + 1
-        If winddirection = "into" Then windfactor = (100 - windstrength) / 100
-
-        windlieclub = roughclub * windfactor
-
-SpinEffects:
-        'waiting to find out what these effects might on the flight distance of the golf ball
-
-Difference:  'between modified club potential and modified distance to hole:
-
-        difference = windlieclub - distance_w_elev
-
-Factors:  'to work with to help to eliminate the difference between demand and capability
-        'can play with this.  Working with the difference alone did not help in the beginning
-
-        factor1 = 0.5
-        fdifference = difference * factor1
-
-        Ffactor = fdifference / windlieclub
-
-        Ffactor = Ffactor * 10 'brings it to tenths of a centimeter
-        'what portion of power bar to stop at, thereby reducing 
-
-Convert_to_Strings:
-
-        Dim s_factor1 As String = CStr(factor1)
-        Dim s_ffactor As String = CStr(Ffactor)
-        Dim s_holeelevation As String = CStr(hole_elevation)
-        Dim s_holedistance As String = CStr(holedistance)
-        Dim s_windstrength As String = CStr(windstrength)
-        Dim s_winddirection As String = CStr(winddirection)
-        Dim s_clubselection As String = CStr(clubselection)
-        Dim s_fullclubselection As String = CStr(fullclubselection)
-        Dim s_rough_lie As String = CStr(rough_lie)
-        Dim s_clubpower As String = CStr(clubpower)
-        Dim s_roughclub As String = CStr(roughclub)
-        Dim s_windlieclub As String = CStr(windlieclub)
-        Dim s_spin As String = CStr(spin)
-        Dim s_swingselection As String = CStr(swingselection)
-        Dim s_difference As String = CStr(difference)
-        Dim s_distance_w_elev As String = CStr(distance_w_elev)
-
-Finalsummary:
-        Dim s_endclubsummary As String = "No comment"
-        'the club along with its reduced power swing, or a statement that a lower numbered club be used.
-        If Ffactor >= -0.0 Then
-            s_endclubsummary = s_swingselection + "  " + clubselection + "  " + s_ffactor
-        ElseIf Ffactor < 0 Then
-            s_endclubsummary = "Choose a higher club this hole"
-        End If
-
-        Dim para00 As String = "Hole Challenge:------------------" + holeID
-        Dim para01 As String = "Club Considered:--------------------------------------------------------  " + s_fullclubselection
-        Dim para1a As String = "Swing selection:------------------------------------------------  " + s_swingselection
-        Dim para02 As String = "Distance to hole:-------------------------------------------------------------------------  " + s_holedistance
-        Dim para03 As String = "Hole elevation:---------------------------------------------------  " + s_holeelevation
-        Dim para04 As String = "Elevation factor applied to distance-------------  " + s_elevation_factor
-        Dim para05 As String = "New distance from elevation factor--------------------------------------------------  " + s_distance_w_elev
-        Dim para06 As String = "Rough/Sand lie:-------------------------------------------------  " + s_rough_lie
-        Dim para07 As String = "Rough or Sand factor:------------------------------  " + s_roughfactor
-        Dim para08 As String = "Changed club from Rough/Sand:------------------------------------------  " + s_roughclub
-        Dim para09 As String = "Wind direction used:-------------------------------------------  " + s_winddirection
-        Dim para10 As String = "Wind strength (portion used out of total):----------------  " + s_windportion
-        Dim para11 As String = "Changed club from wind:-----------------------------------------------------  " + s_windlieclub
-        Dim para12 As String = "Difference bet. final club and hole distance:---------------------  " + s_difference
-        Dim para13 As String = "Factor1 to manipulate the difference-------------  " + s_factor1
-        Dim para14 As String = "Factor2: Final difference/Final club,*10--------------  " + s_ffactor
-        Dim para15 As String = "Recommendations re club:-----------------------------------------------  " + s_endclubsummary
-        Dim para16 As String = "Make certain hole marker is adjusted for wind effects and green approach to the hole"
-        Dim para17 As String = "Record results below of golf stroke, showing cut or slice and landing and ending results:"
-
-
-        Dim aFont As New System.Drawing.Font(" Arial", 10, FontStyle.Bold)
-        g.DrawString(para00, aFont, Brushes.Black, 55, 29)
-        g.DrawString(para01, aFont, Brushes.Black, 75, 50)
-        g.DrawString(para1a, aFont, Brushes.Black, 75, 71)
-        g.DrawString(para02, aFont, Brushes.Black, 75, 92)
-        g.DrawString(para03, aFont, Brushes.Black, 75, 113)
-        g.DrawString(para04, aFont, Brushes.Black, 75, 134)
-        g.DrawString(para05, aFont, Brushes.Black, 75, 155)
-        g.DrawString(para06, aFont, Brushes.Black, 75, 176)
-        g.DrawString(para07, aFont, Brushes.Black, 75, 197)
-        g.DrawString(para08, aFont, Brushes.Black, 75, 218)
-        g.DrawString(para09, aFont, Brushes.Black, 75, 239)
-        g.DrawString(para10, aFont, Brushes.Black, 75, 260)
-        g.DrawString(para11, aFont, Brushes.Black, 75, 281)
-        g.DrawString(para12, aFont, Brushes.Black, 75, 302)
-        g.DrawString(para13, aFont, Brushes.Black, 75, 323)
-        g.DrawString(para14, aFont, Brushes.Black, 75, 344)
-        g.DrawString(para15, aFont, Brushes.Black, 75, 365)
-        g.DrawString(para16, aFont, Brushes.Black, 75, 410)
-        g.DrawString(para17, aFont, Brushes.Black, 75, 431)
-
-
-    End Sub
     Private Sub testdistance() '        using simple right angle style - or railway track
         'width = (lessht / landht) * bottomwidth
         g.DrawLine(Pens.Green, 0, horizon, Image.Width, horizon)
@@ -1398,7 +1231,7 @@ nonCMB:
     End Sub
     Private Sub rivertrees(ByVal x, ByVal y, ByVal width, ByVal height)
 
-         Dim rect As New Rectangle(x, y, width, height)
+        Dim rect As New Rectangle(x, y, width, height)
 
         'SET UP PATH TO INCLUDE SEVERAL ARCS AROUND THE EDGE OF THE RECTANGLE
         Dim n, arcbegin, arclength As Integer
@@ -1445,7 +1278,7 @@ nonCMB:
 
             arcs_path.AddArc(startx, starty, rectwid, recthgt, arcbegin, arclength)
         Next n
-       
+
         g.SetClip(arcs_path)
         colorblend(arcs_path.GetBounds.X, arcs_path.GetBounds.Y, arcs_path.GetBounds.Width, _
                arcs_path.GetBounds.Height, "river trees", 0)
@@ -1453,7 +1286,7 @@ nonCMB:
 
         Dim stainpen As New Pen(Color.Black, 1)
         If Settings.Outlines = True Then g.DrawPath(stainpen, arcs_path)
-       
+
     End Sub
     Private Sub landshape(ByVal typ, ByVal begy, ByVal numdiv, ByVal yvar, ByVal grade, ByVal curv, ByVal distance)
         'ref from rollinghill
@@ -4661,6 +4494,8 @@ shade:
     End Sub
 
     Private Sub makeskyfluffclouds()
+        'This is an attempt to obtain soft edges for the shapes that are drawn and painted.
+        'It seems that only an ellipse is entitled to this softening of the edges.
         Dim x, y, a, b, c, d As Integer
 
         Dim fluffwidth As Integer = randh(300, 400)
